@@ -1,8 +1,10 @@
 package com.example.quicknote.screen
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,7 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
@@ -59,8 +61,16 @@ fun ListScreen() {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(items = noteList) { item ->
-                    ListItem(item)
+                itemsIndexed(items = noteList) { index, item ->
+                    ListItem(
+                        note = item,
+                        onClick = {},
+                        onLongClick = {
+                            noteList.removeRange(index, index + 1)
+                            Log.d("Grid", "$index")
+                        }
+
+                    )
                 }
             }
         }
@@ -69,9 +79,11 @@ fun ListScreen() {
 
 @Composable
 fun SaveNoteBox(note: TextFieldState, onSaveClick: () -> Unit) {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(10.dp)) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+    ) {
         TextField(
             state = note,
             lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = 10),
@@ -92,9 +104,13 @@ fun SaveNoteBox(note: TextFieldState, onSaveClick: () -> Unit) {
 }
 
 @Composable
-fun ListItem(note: String) {
+fun ListItem(note: String, onClick: () -> Unit, onLongClick: () -> Unit) {
     Row(
         modifier = Modifier
+            .combinedClickable(
+                onLongClick = onLongClick,
+                onClick = onClick,
+            )
             .clip(
                 RoundedCornerShape(8.dp)
             )
