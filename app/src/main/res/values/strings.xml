@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">QuickNote</string>
+    <string name="enter_your_note">Enter your note!</string>
+    <string name="save">Save</string>
 </resources>
