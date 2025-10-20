@@ -1,6 +1,5 @@
 package com.example.quicknote.screen
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,6 +15,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.quicknote.R
@@ -67,9 +68,7 @@ fun ListScreen() {
                         onClick = {},
                         onLongClick = {
                             noteList.removeRange(index, index + 1)
-                            Log.d("Grid", "$index")
                         }
-
                     )
                 }
             }
@@ -86,8 +85,10 @@ fun SaveNoteBox(note: TextFieldState, onSaveClick: () -> Unit) {
     ) {
         TextField(
             state = note,
-            lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = 10),
+            lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = 8),
             label = { Text(stringResource(R.string.enter_your_note)) },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            onKeyboardAction = { onSaveClick() },
             modifier = Modifier
                 .fillMaxWidth(0.75f)
                 .padding(end = 10.dp)
