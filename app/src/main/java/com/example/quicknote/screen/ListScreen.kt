@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
@@ -51,19 +51,16 @@ fun ListScreen() {
 
     fun saveValues() {
         if (note.text.isNotEmpty()) {
-            val text = "" + System.currentTimeMillis() + "|${note.text}"
             scope.launch {
-                dataStoreManager.saveNotes((noteList + text))
+                dataStoreManager.saveNewNote(note.text.toString())
+                note.clearText()
             }
-            note.clearText()
         }
     }
 
-    fun deleteValue(index: Int) {
+    fun deleteValue(key: String) {
         scope.launch {
-            val notes = noteList.toMutableList()
-            notes.removeAt(index)
-            dataStoreManager.saveNotes(notes)
+            dataStoreManager.deleteNote(key)
         }
     }
 
@@ -85,12 +82,12 @@ fun ListScreen() {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalItemSpacing = 8.dp
             ) {
-                itemsIndexed(items = noteList) { index, item ->
+                items(items = noteList, key = { it.key }) { item ->
                     ListItem(
-                        note = item,
+                        note = item.value,
                         onClick = {},
                         onLongClick = {
-                            deleteValue(index)
+                            deleteValue(item.key)
                         }
                     )
                 }
@@ -146,7 +143,7 @@ fun ListItem(note: String, onClick: () -> Unit, onLongClick: () -> Unit) {
             .padding(8.dp)
     ) {
         Text(
-            note.split("|", limit = 2).last(),
+            note,
             modifier = Modifier.align(Alignment.CenterVertically)
         )
     }
