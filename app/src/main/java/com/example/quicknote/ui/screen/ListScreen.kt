@@ -1,4 +1,4 @@
-package com.example.quicknote.screen
+package com.example.quicknote.ui.screen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -28,41 +28,22 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.quicknote.R
-import kotlinx.coroutines.launch
+import com.example.quicknote.domain.Note
+import com.example.quicknote.presentation.ListViewModel
 
 @Composable
-fun ListScreen() {
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val dataStoreManager = remember { DataStoreManager(context) }
-    val noteList by dataStoreManager.notes.collectAsState(emptyList())
+fun ListScreen(listViewModel: ListViewModel = hiltViewModel()) {
+    val noteList by listViewModel.notesFlow.collectAsState(emptyList())
     val note = rememberTextFieldState()
-
-    fun saveValues() {
-        if (note.text.isNotEmpty()) {
-            scope.launch {
-                dataStoreManager.saveNewNote(note.text.toString())
-                note.clearText()
-            }
-        }
-    }
-
-    fun deleteValue(key: String) {
-        scope.launch {
-            dataStoreManager.deleteNote(key)
-        }
-    }
 
     Scaffold { innerPadding ->
         Column(
@@ -73,21 +54,23 @@ fun ListScreen() {
             SaveNoteBox(
                 note = note,
                 onSaveClick = {
-                    saveValues()
+                    listViewModel.addNote(Note(value = note.text.toString()))
+                    note.clearText()
                 }
             )
+
             LazyVerticalStaggeredGrid(
                 columns = StaggeredGridCells.Fixed(2),
                 contentPadding = PaddingValues(horizontal = 10.dp, vertical = 5.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalItemSpacing = 8.dp
             ) {
-                items(items = noteList, key = { it.key }) { item ->
+                items(items = noteList, key = { it.id }) { item ->
                     ListItem(
                         note = item.value,
                         onClick = {},
                         onLongClick = {
-                            deleteValue(item.key)
+                            listViewModel.deleteNote(item.id)
                         }
                     )
                 }
@@ -113,6 +96,7 @@ fun SaveNoteBox(note: TextFieldState, onSaveClick: () -> Unit) {
                 .fillMaxWidth(0.75f)
                 .padding(end = 10.dp)
         )
+
         Button(
             onClick = onSaveClick,
             modifier = Modifier
