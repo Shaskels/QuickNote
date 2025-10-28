@@ -2,10 +2,11 @@ package com.example.quicknote.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val BackgroundBrand = Color(0xFFffb21e)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val SelectionColor = Color(0xA6FFB21E)
+val Background = Color(0xFFf7f7f7)
+val NoteBackground = Color(0xFFffffff)
+val TextPrimary = Color(0xFF1d1d1d)
+val TextSecondary = Color(0XFF666666)
+val TextLight = Color(0xFFaaaaaa)

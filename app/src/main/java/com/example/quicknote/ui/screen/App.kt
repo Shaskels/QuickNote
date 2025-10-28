@@ -8,20 +8,28 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.quicknote.domain.Note
 import com.example.quicknote.presentation.ListViewModel
+import com.example.quicknote.ui.theme.NoteTheme
 
 @Composable
 fun App(listViewModel: ListViewModel = hiltViewModel()) {
     val navController = rememberNavController()
 
-    Scaffold { paddingValues ->
+    Scaffold(containerColor = NoteTheme.colors.backgroundColor) { paddingValues ->
         NavHost(
             navController = navController,
             startDestination = NoteList,
             modifier = Modifier.padding(paddingValues)
         ) {
             composable<NoteList> {
-                ListScreen(listViewModel)
+                NoteListScreen(
+                    listViewModel = listViewModel,
+                    onNoteClick = { navController.navigate(NoteRoute) }
+                )
+            }
+            composable<NoteRoute> {
+                NoteScreen(Note(value = ""))
             }
         }
     }
