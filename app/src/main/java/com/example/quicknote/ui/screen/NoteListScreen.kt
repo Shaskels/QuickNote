@@ -1,8 +1,6 @@
 package com.example.quicknote.ui.screen
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,15 +14,13 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,41 +35,48 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.quicknote.R
 import com.example.quicknote.domain.Note
 import com.example.quicknote.presentation.ListViewModel
+import com.example.quicknote.ui.component.BrandTextField
+import com.example.quicknote.ui.theme.NoteTheme
 
 @Composable
-fun ListScreen(listViewModel: ListViewModel = hiltViewModel()) {
+fun NoteListScreen(listViewModel: ListViewModel, onNoteClick: () -> Unit) {
     val noteList by listViewModel.notesFlow.collectAsState(emptyList())
     val note = rememberTextFieldState()
 
-    Scaffold { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            SaveNoteBox(
-                note = note,
-                onSaveClick = {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        SaveNoteBox(
+            note = note,
+            onSaveClick = {
+                if (note.text.isNotEmpty()) {
                     listViewModel.addNote(Note(value = note.text.toString()))
                     note.clearText()
                 }
-            )
+            }
+        )
 
-            LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Fixed(2),
-                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 5.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalItemSpacing = 8.dp
-            ) {
-                items(items = noteList, key = { it.id }) { item ->
-                    ListItem(
-                        note = item.value,
-                        onClick = {},
-                        onLongClick = {
-                            listViewModel.deleteNote(item.id)
-                        }
-                    )
-                }
+        Text(
+            text = stringResource(R.string.notes),
+            modifier = Modifier.padding(vertical = 10.dp, horizontal = 15.dp),
+            style = MaterialTheme.typography.titleLarge
+        )
+
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Fixed(2),
+            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 5.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalItemSpacing = 8.dp
+        ) {
+            items(items = noteList, key = { it.id }) { item ->
+                ListItem(
+                    note = item.value,
+                    onClick = onNoteClick,
+                    onLongClick = {
+                        listViewModel.deleteNote(item.id)
+                    }
+                )
             }
         }
     }
@@ -86,12 +89,11 @@ fun SaveNoteBox(note: TextFieldState, onSaveClick: () -> Unit) {
             .fillMaxWidth()
             .padding(10.dp)
     ) {
-        TextField(
+        BrandTextField(
             state = note,
-            lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = 5),
-            label = { Text(stringResource(R.string.enter_your_note)) },
+            hint = stringResource(R.string.enter_your_note),
+            onKeyboardAction = onSaveClick,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            onKeyboardAction = { onSaveClick() },
             modifier = Modifier
                 .fillMaxWidth(0.75f)
                 .padding(end = 10.dp)
@@ -101,7 +103,11 @@ fun SaveNoteBox(note: TextFieldState, onSaveClick: () -> Unit) {
             onClick = onSaveClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.CenterVertically)
+                .align(Alignment.CenterVertically),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = NoteTheme.colors.backgroundBrand,
+                contentColor = NoteTheme.colors.noteBackground
+            )
         ) {
             Text(stringResource(R.string.save))
         }
@@ -119,16 +125,13 @@ fun ListItem(note: String, onClick: () -> Unit, onLongClick: () -> Unit) {
             .clip(
                 RoundedCornerShape(8.dp)
             )
-            .background(color = MaterialTheme.colorScheme.surfaceContainer)
-            .border(
-                BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-                shape = RoundedCornerShape(8.dp)
-            )
+            .background(color = NoteTheme.colors.noteBackground)
             .padding(8.dp)
     ) {
         Text(
             note,
-            modifier = Modifier.align(Alignment.CenterVertically)
+            modifier = Modifier.align(Alignment.CenterVertically),
+            color = NoteTheme.colors.textPrimary
         )
     }
 }
@@ -136,5 +139,5 @@ fun ListItem(note: String, onClick: () -> Unit, onLongClick: () -> Unit) {
 @Preview
 @Composable
 private fun ListScreenPreview() {
-    ListScreen()
+    NoteListScreen(listViewModel = hiltViewModel(), {})
 }
