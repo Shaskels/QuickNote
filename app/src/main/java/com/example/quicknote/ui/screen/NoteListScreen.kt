@@ -22,7 +22,6 @@ import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -41,39 +40,36 @@ import com.example.quicknote.domain.Note
 import com.example.quicknote.presentation.ListViewModel
 
 @Composable
-fun ListScreen(listViewModel: ListViewModel = hiltViewModel()) {
+fun ListScreen(listViewModel: ListViewModel) {
     val noteList by listViewModel.notesFlow.collectAsState(emptyList())
     val note = rememberTextFieldState()
 
-    Scaffold { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            SaveNoteBox(
-                note = note,
-                onSaveClick = {
-                    listViewModel.addNote(Note(value = note.text.toString()))
-                    note.clearText()
-                }
-            )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        SaveNoteBox(
+            note = note,
+            onSaveClick = {
+                listViewModel.addNote(Note(value = note.text.toString()))
+                note.clearText()
+            }
+        )
 
-            LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Fixed(2),
-                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 5.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalItemSpacing = 8.dp
-            ) {
-                items(items = noteList, key = { it.id }) { item ->
-                    ListItem(
-                        note = item.value,
-                        onClick = {},
-                        onLongClick = {
-                            listViewModel.deleteNote(item.id)
-                        }
-                    )
-                }
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Fixed(2),
+            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 5.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalItemSpacing = 8.dp
+        ) {
+            items(items = noteList, key = { it.id }) { item ->
+                ListItem(
+                    note = item.value,
+                    onClick = {},
+                    onLongClick = {
+                        listViewModel.deleteNote(item.id)
+                    }
+                )
             }
         }
     }
@@ -136,5 +132,5 @@ fun ListItem(note: String, onClick: () -> Unit, onLongClick: () -> Unit) {
 @Preview
 @Composable
 private fun ListScreenPreview() {
-    ListScreen()
+    ListScreen(listViewModel = hiltViewModel())
 }

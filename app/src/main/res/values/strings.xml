@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">QuickNote</string>
+    <string name="headline">Headline</string>
     <string name="enter_your_note">Enter your note!</string>
+    <string name="back_to_note_list">Back to note list</string>
+    <string name="note_done">Note done</string>
     <string name="save">Save</string>
 </resources>
