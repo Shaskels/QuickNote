@@ -8,6 +8,9 @@ sealed interface Route {
     object NoteList : Route
 
     @Serializable
+    object DeletedNoteList : Route
+
+    @Serializable
     object NewNote : Route
 
     @Serializable

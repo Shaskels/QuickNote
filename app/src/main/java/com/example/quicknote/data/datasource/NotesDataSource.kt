@@ -1,16 +1,19 @@
-package com.example.quicknote.data.datastore
+package com.example.quicknote.data.datasource
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.example.quicknote.di.Notes
 import com.example.quicknote.domain.Note
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 
-class NotesDataSource @Inject constructor(private val dataStore: DataStore<Preferences>) {
+class NotesDataSource @Inject constructor(
+    @Notes private val dataStore: DataStore<Preferences>
+) {
 
     val notes: Flow<List<Note>> = dataStore.data.map { preferences ->
         preferences.asMap().map { mapEntry ->

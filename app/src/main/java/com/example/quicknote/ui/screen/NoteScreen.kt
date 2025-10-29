@@ -3,6 +3,7 @@ package com.example.quicknote.ui.screen
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -83,9 +84,12 @@ fun NoteScreen(
                     navigationIconContentColor = NoteTheme.colors.textPrimary,
                     actionIconContentColor = NoteTheme.colors.textPrimary
                 ),
+                windowInsets = WindowInsets(top = 0.dp),
                 modifier = Modifier.fillMaxWidth()
             )
-        }) { innerPadding ->
+        },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxWidth()

@@ -1,6 +1,6 @@
 package com.example.quicknote.data.repository
 
-import com.example.quicknote.data.datastore.NotesDataSource
+import com.example.quicknote.data.datasource.NotesDataSource
 import com.example.quicknote.domain.Note
 import com.example.quicknote.domain.repository.NotesRepository
 import jakarta.inject.Inject

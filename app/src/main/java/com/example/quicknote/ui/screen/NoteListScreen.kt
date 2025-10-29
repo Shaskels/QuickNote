@@ -5,6 +5,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -20,10 +21,17 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
@@ -35,6 +43,7 @@ import com.example.quicknote.R
 import com.example.quicknote.domain.Note
 import com.example.quicknote.presentation.NoteListViewModel
 import com.example.quicknote.ui.theme.NoteTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun NoteListScreen(
@@ -43,6 +52,8 @@ fun NoteListScreen(
     onAddNoteClick: () -> Unit,
 ) {
     val noteList by noteListViewModel.notesFlow.collectAsState(emptyList())
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         containerColor = NoteTheme.colors.backgroundColor,
@@ -58,7 +69,18 @@ fun NoteListScreen(
                 Icon(imageVector = Icons.Filled.Add, contentDescription = "add note")
             }
         },
-        floatingActionButtonPosition = FabPosition.EndOverlay
+        floatingActionButtonPosition = FabPosition.End,
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) {
+                Snackbar(
+                    snackbarData = it,
+                    containerColor = NoteTheme.colors.textLight,
+                    contentColor = NoteTheme.colors.textPrimary,
+                    actionColor = NoteTheme.colors.backgroundBrand,
+                )
+            }
+        },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -84,7 +106,26 @@ fun NoteListScreen(
                             onNoteClick(item.id)
                         },
                         onLongClick = {
-                            noteListViewModel.deleteNote(item.id)
+                            noteListViewModel.addNoteToTrash(item)
+                            scope.launch {
+                                val result = snackbarHostState
+                                    .showSnackbar(
+                                        message = "Are you sure you want to delete?",
+                                        actionLabel = "Undo",
+                                        duration = SnackbarDuration.Short
+                                    )
+                                when (result) {
+                                    SnackbarResult.ActionPerformed -> {
+                                        noteListViewModel.deleteNoteFromTrash(item.id)
+                                    }
+
+                                    SnackbarResult.Dismissed -> {
+                                        noteListViewModel.deleteNote(item.id)
+                                    }
+                                }
+                            }
+
+
                         }
                     )
                 }

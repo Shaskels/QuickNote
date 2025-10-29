@@ -10,6 +10,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import jakarta.inject.Qualifier
 import javax.inject.Singleton
 
 @Module
@@ -18,6 +19,7 @@ class DataModule {
 
     @Provides
     @Singleton
+    @Notes
     fun provideDataStore(
         @ApplicationContext context: Context
     ): DataStore<Preferences> {
@@ -25,4 +27,23 @@ class DataModule {
             context.preferencesDataStoreFile("notes")
         }
     }
+
+    @Provides
+    @Singleton
+    @DeletedNotes
+    fun provideDeletedNotesDataStore(
+        @ApplicationContext context: Context
+    ): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.create {
+            context.preferencesDataStoreFile("deletedNotes")
+        }
+    }
 }
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class DeletedNotes
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class Notes
