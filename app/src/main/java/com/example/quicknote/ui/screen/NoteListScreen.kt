@@ -1,7 +1,5 @@
 package com.example.quicknote.ui.screen
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,14 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -33,16 +24,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.quicknote.R
-import com.example.quicknote.domain.Note
 import com.example.quicknote.presentation.NoteListViewModel
+import com.example.quicknote.ui.component.AddButton
+import com.example.quicknote.ui.component.NoteItemInList
 import com.example.quicknote.ui.theme.NoteTheme
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -58,16 +49,11 @@ fun NoteListScreen(
     Scaffold(
         containerColor = NoteTheme.colors.backgroundColor,
         floatingActionButton = {
-            FloatingActionButton(
-                shape = CircleShape,
+            AddButton(
                 onClick = onAddNoteClick,
-                containerColor = NoteTheme.colors.backgroundBrand,
-                contentColor = NoteTheme.colors.noteBackground,
-                elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp),
+                description = "add note",
                 modifier = Modifier.padding(bottom = 15.dp, end = 15.dp)
-            ) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "add note")
-            }
+            )
         },
         floatingActionButtonPosition = FabPosition.End,
         snackbarHost = {
@@ -100,32 +86,19 @@ fun NoteListScreen(
                 verticalItemSpacing = 8.dp
             ) {
                 items(items = noteList, key = { it.id }) { item ->
-                    ListItem(
+                    NoteItemInList(
                         note = item,
                         onClick = {
                             onNoteClick(item.id)
                         },
                         onLongClick = {
                             noteListViewModel.addNoteToTrash(item)
-                            scope.launch {
-                                val result = snackbarHostState
-                                    .showSnackbar(
-                                        message = "Are you sure you want to delete?",
-                                        actionLabel = "Undo",
-                                        duration = SnackbarDuration.Short
-                                    )
-                                when (result) {
-                                    SnackbarResult.ActionPerformed -> {
-                                        noteListViewModel.deleteNoteFromTrash(item.id)
-                                    }
-
-                                    SnackbarResult.Dismissed -> {
-                                        noteListViewModel.deleteNote(item.id)
-                                    }
-                                }
-                            }
-
-
+                            showSnackbar(
+                                scope = scope,
+                                snackbarHostState = snackbarHostState,
+                                onActionPerformed = { noteListViewModel.removeNoteFromTrash(item.id) },
+                                onDismiss = { noteListViewModel.deleteNote(item.id) }
+                            )
                         }
                     )
                 }
@@ -134,37 +107,23 @@ fun NoteListScreen(
     }
 }
 
-@Composable
-fun ListItem(note: Note, onClick: () -> Unit, onLongClick: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .combinedClickable(
-                onLongClick = onLongClick,
-                onClick = onClick,
+private fun showSnackbar(
+    scope: CoroutineScope,
+    snackbarHostState: SnackbarHostState,
+    onActionPerformed: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    scope.launch {
+        val result = snackbarHostState
+            .showSnackbar(
+                message = "Are you sure you want to delete?",
+                actionLabel = "Undo",
+                duration = SnackbarDuration.Short
             )
-            .clip(
-                RoundedCornerShape(8.dp)
-            )
-            .background(color = NoteTheme.colors.noteBackground)
-            .padding(12.dp)
-    ) {
-        Text(
-            note.headline,
-            color = NoteTheme.colors.textPrimary,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
-            modifier = Modifier
-                .padding(bottom = 10.dp),
-        )
-
-        Text(
-            note.value,
-            color = NoteTheme.colors.textSecondary,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 4,
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(),
-        )
+        when (result) {
+            SnackbarResult.ActionPerformed -> onActionPerformed()
+            SnackbarResult.Dismissed -> onDismiss()
+        }
     }
 }
 

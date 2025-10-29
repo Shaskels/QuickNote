@@ -32,7 +32,6 @@ import com.example.quicknote.domain.Note
 import com.example.quicknote.ui.component.BrandTextField
 import com.example.quicknote.ui.theme.NoteTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteScreen(
     note: Note,
@@ -50,43 +49,19 @@ fun NoteScreen(
     Scaffold(
         containerColor = NoteTheme.colors.backgroundColor,
         topBar = {
-            TopAppBar(
-                title = {},
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.Rounded.ArrowBack,
-                            contentDescription = stringResource(R.string.back_to_note_list)
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = {
-                        if (headline.text.isNotEmpty() || value.text.isNotEmpty()) {
-                            onSaveClick(
-                                Note(
-                                    note.id,
-                                    headline.text.toString(),
-                                    value.text.toString()
-                                )
+            TopBar(
+                onBackClick = onBackClick,
+                onSaveClick = {
+                    if (headline.text.isNotEmpty() || value.text.isNotEmpty()) {
+                        onSaveClick(
+                            Note(
+                                note.id,
+                                headline.text.toString(),
+                                value.text.toString()
                             )
-                        }
-                    }) {
-                        Icon(
-                            imageVector = Icons.Rounded.Done,
-                            contentDescription = stringResource(R.string.note_done)
                         )
                     }
-                },
-                expandedHeight = 40.dp,
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = NoteTheme.colors.backgroundColor,
-                    navigationIconContentColor = NoteTheme.colors.textPrimary,
-                    actionIconContentColor = NoteTheme.colors.textPrimary
-                ),
-                windowInsets = WindowInsets(top = 0.dp),
-                modifier = Modifier.fillMaxWidth()
-            )
+                })
         },
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { innerPadding ->
@@ -119,6 +94,38 @@ fun NoteScreen(
         }
     }
 
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopBar(onBackClick: () -> Unit, onSaveClick: () -> Unit) {
+    TopAppBar(
+        title = {},
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    imageVector = Icons.Rounded.ArrowBack,
+                    contentDescription = stringResource(R.string.back_to_note_list)
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = onSaveClick) {
+                Icon(
+                    imageVector = Icons.Rounded.Done,
+                    contentDescription = stringResource(R.string.note_done)
+                )
+            }
+        },
+        expandedHeight = 40.dp,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = NoteTheme.colors.backgroundColor,
+            navigationIconContentColor = NoteTheme.colors.textPrimary,
+            actionIconContentColor = NoteTheme.colors.textPrimary
+        ),
+        windowInsets = WindowInsets(top = 0.dp),
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 @Preview
