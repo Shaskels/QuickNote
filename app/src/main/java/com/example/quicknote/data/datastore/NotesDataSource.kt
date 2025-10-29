@@ -8,19 +8,20 @@ import com.example.quicknote.domain.Note
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.json.Json
 
 class NotesDataSource @Inject constructor(private val dataStore: DataStore<Preferences>) {
 
     val notes: Flow<List<Note>> = dataStore.data.map { preferences ->
         preferences.asMap().map { mapEntry ->
-            Note(mapEntry.key.name, mapEntry.value as String)
+            Json.decodeFromString<Note>(mapEntry.value.toString())
         }
     }
 
-    suspend fun saveNewNote(note: Note) {
+    suspend fun saveNote(note: Note) {
         dataStore.edit { preferences ->
-            val prefKey = stringPreferencesKey("${System.currentTimeMillis()}")
-            preferences[prefKey] = note.value
+            val prefKey = stringPreferencesKey(note.id)
+            preferences[prefKey] = Json.encodeToString(note)
         }
     }
 
@@ -30,4 +31,14 @@ class NotesDataSource @Inject constructor(private val dataStore: DataStore<Prefe
             preferences.remove(prefKey)
         }
     }
+
+    fun getNoteByKey(key: String): Flow<Note> {
+        val prefKey = stringPreferencesKey(key)
+        return dataStore.data.map { preferences ->
+            Json.decodeFromString<Note>(
+                preferences[prefKey] ?: ""
+            )
+        }
+    }
+
 }

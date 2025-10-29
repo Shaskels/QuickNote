@@ -3,21 +3,20 @@ package com.example.quicknote.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quicknote.domain.Note
-import com.example.quicknote.domain.usecase.DeleteNoteUseCase
-import com.example.quicknote.domain.usecase.GetNotesUseCase
+import com.example.quicknote.domain.usecase.GetNoteByIdUseCase
 import com.example.quicknote.domain.usecase.SaveNoteUseCase
+import com.example.quicknote.domain.usecase.UpdateNoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
-class ListViewModel @Inject constructor(
-    private val deleteNoteUseCase: DeleteNoteUseCase,
+class NoteViewModel @Inject constructor(
     private val saveNoteUseCase: SaveNoteUseCase,
-    getNotesUseCase: GetNotesUseCase
+    private val updateNoteUseCase: UpdateNoteUseCase,
+    private val getNoteByIdUseCase: GetNoteByIdUseCase,
 ) : ViewModel() {
-
-    val notesFlow = getNotesUseCase()
 
     fun addNote(note: Note) {
         viewModelScope.launch {
@@ -25,9 +24,14 @@ class ListViewModel @Inject constructor(
         }
     }
 
-    fun deleteNote(id: String) {
+    fun updateNote(note: Note) {
         viewModelScope.launch {
-            deleteNoteUseCase(id)
+            updateNoteUseCase(note)
         }
     }
+
+    fun getNoteById(id: String): Flow<Note> {
+        return getNoteByIdUseCase(id)
+    }
+
 }

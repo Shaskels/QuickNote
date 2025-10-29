@@ -9,5 +9,9 @@ interface NotesRepository {
 
     suspend fun saveNote(note: Note)
 
+    suspend fun updateNote(note: Note)
+
     suspend fun deleteNote(id: String)
+
+    fun getNoteById(id: String): Flow<Note>
 }
