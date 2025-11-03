@@ -16,12 +16,17 @@ import com.example.quicknote.domain.Note
 import com.example.quicknote.ui.theme.NoteTheme
 
 @Composable
-fun NoteItemInList(note: Note, onClick: () -> Unit, onLongClick: () -> Unit) {
+fun NoteItemInList(
+    note: Note,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .combinedClickable(
-                onLongClick = onLongClick,
                 onClick = onClick,
+                onLongClick = onLongClick,
             )
             .clip(
                 RoundedCornerShape(8.dp)
@@ -44,7 +49,14 @@ fun NoteItemInList(note: Note, onClick: () -> Unit, onLongClick: () -> Unit) {
             overflow = TextOverflow.Ellipsis,
             maxLines = 4,
             style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(),
+            modifier = Modifier.padding(bottom = 10.dp),
+        )
+
+        Text(
+            note.timeOfChange,
+            color = NoteTheme.colors.textLight,
+            maxLines = 1,
+            style = MaterialTheme.typography.labelSmall,
         )
     }
 }

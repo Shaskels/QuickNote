@@ -5,4 +5,4 @@ import com.example.quicknote.domain.repository.NotesRepository
 import jakarta.inject.Inject
 
 class SaveNoteUseCase @Inject constructor(private val notesRepository: NotesRepository) :
-    suspend (Note) -> Unit by { note: Note -> notesRepository.saveNote(note) }
+    suspend (Note) -> Unit by notesRepository::saveNote

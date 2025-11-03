@@ -6,4 +6,4 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetDeletedNotesUseCase @Inject constructor(private val deletedNotesRepository: DeletedNotesRepository) :
-        () -> Flow<List<Note>> by { deletedNotesRepository.getNotes() }
+        () -> Flow<List<Note>> by deletedNotesRepository::getNotes

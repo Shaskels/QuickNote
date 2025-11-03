@@ -23,6 +23,7 @@ class NoteListViewModel @Inject constructor(
 ) : ViewModel() {
 
     val deletedNotesFlow = getDeletedNotesUseCase()
+
     val notesFlow = getNotesUseCase().combine(deletedNotesFlow) { notes, deletedNotes ->
         notes.filter { note -> deletedNotes.firstOrNull { note.id == it.id } == null }
     }

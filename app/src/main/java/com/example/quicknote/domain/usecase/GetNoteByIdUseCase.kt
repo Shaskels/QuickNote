@@ -6,4 +6,4 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetNoteByIdUseCase @Inject constructor(private val notesRepository: NotesRepository) :
-        (String) -> Flow<Note> by { id: String -> notesRepository.getNoteById(id) }
+        (String) -> Flow<Note> by notesRepository::getNoteById

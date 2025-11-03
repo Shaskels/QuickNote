@@ -14,5 +14,5 @@ sealed interface Route {
     object NewNote : Route
 
     @Serializable
-    data class ExistingNote(val id: String) : Route
+    data class ExistingNote(val id: String, val x: Float, val y: Float) : Route
 }

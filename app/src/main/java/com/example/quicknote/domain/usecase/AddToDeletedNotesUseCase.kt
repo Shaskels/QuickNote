@@ -5,4 +5,4 @@ import com.example.quicknote.domain.repository.DeletedNotesRepository
 import javax.inject.Inject
 
 class AddToDeletedNotesUseCase @Inject constructor(private val deletedNotesRepository: DeletedNotesRepository) :
-    suspend (Note) -> Unit by { note -> deletedNotesRepository.saveNote(note) }
+    suspend (Note) -> Unit by deletedNotesRepository::saveNote

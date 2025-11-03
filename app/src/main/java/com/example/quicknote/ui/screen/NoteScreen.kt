@@ -7,9 +7,8 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Done
@@ -18,14 +17,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.quicknote.R
 import com.example.quicknote.domain.Note
@@ -36,32 +36,19 @@ import com.example.quicknote.ui.theme.NoteTheme
 fun NoteScreen(
     note: Note,
     onBackClick: () -> Unit,
-    onSaveClick: (Note) -> Unit,
+    onSaveClick: () -> Unit,
+    onHeadlineChanged: (String) -> Unit,
+    onValueChanged: (String) -> Unit,
 ) {
-    val headline = rememberTextFieldState(note.headline)
-    val value = rememberTextFieldState(note.value)
-
-    LaunchedEffect(note) {
-        headline.setTextAndPlaceCursorAtEnd(note.headline)
-        value.setTextAndPlaceCursorAtEnd(note.value)
-    }
+    val localFocusManager = LocalFocusManager.current
 
     Scaffold(
         containerColor = NoteTheme.colors.backgroundColor,
         topBar = {
             TopBar(
                 onBackClick = onBackClick,
-                onSaveClick = {
-                    if (headline.text.isNotEmpty() || value.text.isNotEmpty()) {
-                        onSaveClick(
-                            Note(
-                                note.id,
-                                headline.text.toString(),
-                                value.text.toString()
-                            )
-                        )
-                    }
-                })
+                onSaveClick = onSaveClick
+            )
         },
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { innerPadding ->
@@ -74,20 +61,33 @@ fun NoteScreen(
                 .padding(innerPadding)
         ) {
             BrandTextField(
-                state = headline,
+                value = note.headline,
+                onValueChanged = onHeadlineChanged,
                 hint = stringResource(R.string.headline),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                onKeyboardAction = { },
+                keyboardActions = KeyboardActions(onNext = {
+                    localFocusManager.moveFocus(
+                        FocusDirection.Down
+                    )
+                }),
                 modifier = Modifier
                     .fillMaxWidth(),
                 textStyle = MaterialTheme.typography.titleMedium
             )
 
+            Text(
+                text = note.timeOfChange,
+                color = NoteTheme.colors.textLight,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 15.dp)
+            )
+
             BrandTextField(
-                state = value,
+                value = note.value,
+                onValueChanged = onValueChanged,
                 hint = stringResource(R.string.enter_your_note),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                onKeyboardAction = { },
+                keyboardActions = KeyboardActions(onDone = { onSaveClick() }),
                 modifier = Modifier
                     .fillMaxWidth()
             )
@@ -126,10 +126,4 @@ private fun TopBar(onBackClick: () -> Unit, onSaveClick: () -> Unit) {
         windowInsets = WindowInsets(top = 0.dp),
         modifier = Modifier.fillMaxWidth()
     )
-}
-
-@Preview
-@Composable
-private fun NoteScreenPrew() {
-    NoteScreen(Note(headline = "", value = ""), {}, {})
 }

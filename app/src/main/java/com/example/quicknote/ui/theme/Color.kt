@@ -3,7 +3,6 @@ package com.example.quicknote.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val BackgroundBrand = Color(0xFFffb21e)
-
 val SelectionColor = Color(0xA6FFB21E)
 val Background = Color(0xFFf7f7f7)
 val NoteBackground = Color(0xFFffffff)

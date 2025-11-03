@@ -15,8 +15,7 @@ class DeletedNoteListViewModel @Inject constructor(
     getDeletedNotesUseCase: GetDeletedNotesUseCase,
     private val deleteDeletedNotesUseCase: DeleteDeletedNotesUseCase,
     private val saveNoteUseCase: SaveNoteUseCase,
-) :
-    ViewModel() {
+) : ViewModel() {
 
     val deletedNotesFlow = getDeletedNotesUseCase()
 

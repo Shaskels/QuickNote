@@ -12,20 +12,20 @@ import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.quicknote.R
@@ -33,18 +33,21 @@ import com.example.quicknote.presentation.NoteListViewModel
 import com.example.quicknote.ui.component.AddButton
 import com.example.quicknote.ui.component.NoteItemInList
 import com.example.quicknote.ui.theme.NoteTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @Composable
 fun NoteListScreen(
+    snackbarHostState: SnackbarHostState,
     noteListViewModel: NoteListViewModel = hiltViewModel(),
-    onNoteClick: (String) -> Unit,
+    onNoteClick: (String, Float, Float) -> Unit,
     onAddNoteClick: () -> Unit,
+    onShowSnackbar: (String, String, () -> Unit, () -> Unit) -> Unit,
 ) {
     val noteList by noteListViewModel.notesFlow.collectAsState(emptyList())
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
+    var touchedPoint by remember { mutableStateOf(Offset.Zero) }
+
+    DisposableEffect(Unit) {
+        onDispose { snackbarHostState.currentSnackbarData?.dismiss() }
+    }
 
     Scaffold(
         containerColor = NoteTheme.colors.backgroundColor,
@@ -56,21 +59,21 @@ fun NoteListScreen(
             )
         },
         floatingActionButtonPosition = FabPosition.End,
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState) {
-                Snackbar(
-                    snackbarData = it,
-                    containerColor = NoteTheme.colors.textLight,
-                    contentColor = NoteTheme.colors.textPrimary,
-                    actionColor = NoteTheme.colors.backgroundBrand,
-                )
-            }
-        },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0)
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                        event.changes.forEach {
+                            if (it.pressed) {
+                                touchedPoint = it.position
+                            }
+                        }
+                    }
+                }
                 .padding(innerPadding)
         ) {
             Text(
@@ -83,23 +86,23 @@ fun NoteListScreen(
                 columns = StaggeredGridCells.Fixed(2),
                 contentPadding = PaddingValues(horizontal = 10.dp, vertical = 5.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalItemSpacing = 8.dp
+                verticalItemSpacing = 8.dp,
             ) {
                 items(items = noteList, key = { it.id }) { item ->
                     NoteItemInList(
                         note = item,
                         onClick = {
-                            onNoteClick(item.id)
+                            onNoteClick(item.id, touchedPoint.x, touchedPoint.y)
                         },
                         onLongClick = {
                             noteListViewModel.addNoteToTrash(item)
-                            showSnackbar(
-                                scope = scope,
-                                snackbarHostState = snackbarHostState,
-                                onActionPerformed = { noteListViewModel.removeNoteFromTrash(item.id) },
-                                onDismiss = { noteListViewModel.deleteNote(item.id) }
+                            onShowSnackbar(
+                                "Are you sure you want to delete?",
+                                "Undo",
+                                { noteListViewModel.removeNoteFromTrash(item.id) },
+                                { noteListViewModel.deleteNote(item.id) }
                             )
-                        }
+                        },
                     )
                 }
             }
@@ -107,28 +110,4 @@ fun NoteListScreen(
     }
 }
 
-private fun showSnackbar(
-    scope: CoroutineScope,
-    snackbarHostState: SnackbarHostState,
-    onActionPerformed: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    scope.launch {
-        val result = snackbarHostState
-            .showSnackbar(
-                message = "Are you sure you want to delete?",
-                actionLabel = "Undo",
-                duration = SnackbarDuration.Short
-            )
-        when (result) {
-            SnackbarResult.ActionPerformed -> onActionPerformed()
-            SnackbarResult.Dismissed -> onDismiss()
-        }
-    }
-}
 
-@Preview
-@Composable
-private fun ListScreenPreview() {
-    NoteListScreen(noteListViewModel = hiltViewModel(), {}, {})
-}
