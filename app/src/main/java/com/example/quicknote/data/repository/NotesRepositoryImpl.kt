@@ -9,7 +9,9 @@ import kotlinx.coroutines.flow.Flow
 class NotesRepositoryImpl @Inject constructor(private val notesDataSource: NotesDataSource) :
     NotesRepository {
 
-    override fun getNotes(): Flow<List<Note>> = notesDataSource.notes
+    override fun getNotesByQuery(query: String): Flow<List<Note>> {
+        return notesDataSource.getNotesByQuery(query)
+    }
 
     override suspend fun saveNote(note: Note) {
         notesDataSource.saveNote(note)

@@ -9,7 +9,12 @@ import com.example.quicknote.domain.usecase.DeleteNoteUseCase
 import com.example.quicknote.domain.usecase.GetDeletedNotesUseCase
 import com.example.quicknote.domain.usecase.GetNotesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,10 +27,16 @@ class NoteListViewModel @Inject constructor(
     getNotesUseCase: GetNotesUseCase
 ) : ViewModel() {
 
+    private val _queryState = MutableStateFlow("")
+    val queryState: StateFlow<String> = _queryState
+
     val deletedNotesFlow = getDeletedNotesUseCase()
 
-    val notesFlow = getNotesUseCase().combine(deletedNotesFlow) { notes, deletedNotes ->
-        notes.filter { note -> deletedNotes.firstOrNull { note.id == it.id } == null }
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    val notesFlow = _queryState.flatMapLatest { query ->
+        getNotesUseCase(query).combine(deletedNotesFlow) { notes, deletedNotes ->
+            notes.filter { note -> deletedNotes.firstOrNull { note.id == it.id } == null }
+        }
     }
 
     fun addNoteToTrash(note: Note) {
@@ -44,5 +55,13 @@ class NoteListViewModel @Inject constructor(
         viewModelScope.launch {
             deleteNoteUseCase(id)
         }
+    }
+
+    fun onQueryChange(query: String) {
+        _queryState.value = query
+    }
+
+    fun onClearQuery() {
+        _queryState.value = ""
     }
 }

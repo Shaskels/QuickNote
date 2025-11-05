@@ -6,4 +6,4 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetNotesUseCase @Inject constructor(private val notesRepository: NotesRepository) :
-        () -> Flow<List<Note>> by notesRepository::getNotes
+        (String) -> Flow<List<Note>> by notesRepository::getNotesByQuery

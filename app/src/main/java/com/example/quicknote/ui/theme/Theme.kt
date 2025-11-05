@@ -17,6 +17,7 @@ private val DarkColorScheme = NoteColors(
     textSecondary = TextSecondary,
     textLight = TextLight,
     selectionColor = SelectionColor,
+    backgroundSecondary = BackgroundSecondary,
 )
 
 private val LightColorScheme = NoteColors(
@@ -26,7 +27,8 @@ private val LightColorScheme = NoteColors(
     backgroundBrand = BackgroundBrand,
     textSecondary = TextSecondary,
     textLight = TextLight,
-    selectionColor = SelectionColor
+    selectionColor = SelectionColor,
+    backgroundSecondary = BackgroundSecondary,
 )
 
 @Composable
@@ -60,6 +62,7 @@ data class NoteColors(
     val backgroundBrand: Color,
     val textLight: Color,
     val selectionColor: Color,
+    val backgroundSecondary: Color,
 )
 
 private val LocalNoteColors = staticCompositionLocalOf<NoteColors> {

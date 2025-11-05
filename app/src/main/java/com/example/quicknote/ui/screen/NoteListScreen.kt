@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -32,6 +33,7 @@ import com.example.quicknote.R
 import com.example.quicknote.presentation.NoteListViewModel
 import com.example.quicknote.ui.component.AddButton
 import com.example.quicknote.ui.component.NoteItemInList
+import com.example.quicknote.ui.component.SearchField
 import com.example.quicknote.ui.theme.NoteTheme
 
 @Composable
@@ -44,6 +46,7 @@ fun NoteListScreen(
 ) {
     val noteList by noteListViewModel.notesFlow.collectAsState(emptyList())
     var touchedPoint by remember { mutableStateOf(Offset.Zero) }
+    val query = noteListViewModel.queryState.collectAsState()
 
     DisposableEffect(Unit) {
         onDispose { snackbarHostState.currentSnackbarData?.dismiss() }
@@ -80,6 +83,15 @@ fun NoteListScreen(
                 text = stringResource(R.string.notes),
                 modifier = Modifier.padding(vertical = 15.dp, horizontal = 15.dp),
                 style = MaterialTheme.typography.titleLarge
+            )
+
+            SearchField(
+                query = query.value,
+                onQueryChange = noteListViewModel::onQueryChange,
+                onClearQueryClick = noteListViewModel::onClearQuery,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
             )
 
             LazyVerticalStaggeredGrid(

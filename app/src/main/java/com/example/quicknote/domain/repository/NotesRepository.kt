@@ -4,7 +4,7 @@ import com.example.quicknote.domain.Note
 import kotlinx.coroutines.flow.Flow
 
 interface NotesRepository {
-    fun getNotes(): Flow<List<Note>>
+    fun getNotesByQuery(query: String): Flow<List<Note>>
 
     suspend fun saveNote(note: Note)
 

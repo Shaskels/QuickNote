@@ -37,6 +37,7 @@ fun NoteItemInList(
         Text(
             note.headline,
             color = NoteTheme.colors.textPrimary,
+            style = MaterialTheme.typography.titleSmall,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
             modifier = Modifier

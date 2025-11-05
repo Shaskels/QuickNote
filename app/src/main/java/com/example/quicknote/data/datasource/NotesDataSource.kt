@@ -1,6 +1,5 @@
 package com.example.quicknote.data.datasource
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -16,10 +15,11 @@ class NotesDataSource @Inject constructor(
     @Notes private val dataStore: DataStore<Preferences>
 ) {
 
-    val notes: Flow<List<Note>> = dataStore.data.map { preferences ->
-        preferences.asMap().map { mapEntry ->
-            Log.d("fsdfsdf", mapEntry.value.toString())
-            Json.decodeFromString<Note>(mapEntry.value.toString())
+    fun getNotesByQuery(query: String): Flow<List<Note>> {
+        return dataStore.data.map { preferences ->
+            preferences.asMap().map { mapEntry ->
+                Json.decodeFromString<Note>(mapEntry.value.toString())
+            }.filter { note -> "${note.value} ${note.headline}".contains(query) }
         }
     }
 
