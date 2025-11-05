@@ -1,6 +1,8 @@
 package com.example.quicknote.di
 
+import com.example.quicknote.data.repository.DeletedNotesRepositoryImpl
 import com.example.quicknote.data.repository.NotesRepositoryImpl
+import com.example.quicknote.domain.repository.DeletedNotesRepository
 import com.example.quicknote.domain.repository.NotesRepository
 import dagger.Binds
 import dagger.Module
@@ -13,4 +15,7 @@ interface DomainModule {
 
     @Binds
     fun bindNotesRepository(notesRepositoryImpl: NotesRepositoryImpl): NotesRepository
+
+    @Binds
+    fun bindDeletedNotesRepository(deletedNotesRepositoryImpl: DeletedNotesRepositoryImpl): DeletedNotesRepository
 }

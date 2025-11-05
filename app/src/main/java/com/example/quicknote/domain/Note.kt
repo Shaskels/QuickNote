@@ -1,6 +1,15 @@
 package com.example.quicknote.domain
 
-data class Note(
-    val id: String = "",
-    val value: String
+import kotlinx.serialization.Serializable
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
+
+@Serializable
+data class Note @OptIn(ExperimentalUuidApi::class) constructor(
+    val id: String = Uuid.random().toString(),
+    val headline: String,
+    val value: String,
+    val timeOfChange: String
 )
+
+

@@ -6,4 +6,5 @@
     <string name="back_to_note_list">Back to note list</string>
     <string name="note_done">Note done</string>
     <string name="save">Save</string>
+    <string name="trash">Trash</string>
 </resources>

@@ -1,8 +1,7 @@
 package com.example.quicknote.ui.component
 
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.TextFieldLineLimits
-import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
@@ -15,16 +14,17 @@ import com.example.quicknote.ui.theme.NoteTheme
 
 @Composable
 fun BrandTextField(
-    state: TextFieldState,
+    value: String,
+    onValueChanged: (String) -> Unit,
     hint: String,
-    onKeyboardAction: () -> Unit,
+    keyboardActions: KeyboardActions,
     keyboardOptions: KeyboardOptions,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = LocalTextStyle.current,
 ) {
     TextField(
-        state = state,
-        lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = 5),
+        value = value,
+        onValueChanged,
         placeholder = { Text(text = hint, style = textStyle) },
         keyboardOptions = keyboardOptions,
         textStyle = textStyle,
@@ -43,7 +43,7 @@ fun BrandTextField(
                 backgroundColor = NoteTheme.colors.selectionColor
             )
         ),
-        onKeyboardAction = { onKeyboardAction() },
+        keyboardActions = keyboardActions,
         modifier = modifier
     )
 }

@@ -1,26 +1,29 @@
-package com.example.quicknote.data.datastore
+package com.example.quicknote.data.datasource
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.example.quicknote.di.DeletedNotes
 import com.example.quicknote.domain.Note
-import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.json.Json
+import javax.inject.Inject
 
-class NotesDataSource @Inject constructor(private val dataStore: DataStore<Preferences>) {
-
+class DeletedNotesDataSource @Inject constructor(
+    @DeletedNotes private val dataStore: DataStore<Preferences>
+) {
     val notes: Flow<List<Note>> = dataStore.data.map { preferences ->
         preferences.asMap().map { mapEntry ->
-            Note(mapEntry.key.name, mapEntry.value as String)
+            Json.decodeFromString<Note>(mapEntry.value.toString())
         }
     }
 
-    suspend fun saveNewNote(note: Note) {
+    suspend fun saveNote(note: Note) {
         dataStore.edit { preferences ->
-            val prefKey = stringPreferencesKey("${System.currentTimeMillis()}")
-            preferences[prefKey] = note.value
+            val prefKey = stringPreferencesKey(note.id)
+            preferences[prefKey] = Json.encodeToString(note)
         }
     }
 
@@ -30,4 +33,5 @@ class NotesDataSource @Inject constructor(private val dataStore: DataStore<Prefe
             preferences.remove(prefKey)
         }
     }
+
 }

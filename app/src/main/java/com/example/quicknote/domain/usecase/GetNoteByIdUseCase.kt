@@ -5,5 +5,5 @@ import com.example.quicknote.domain.repository.NotesRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetNotesUseCase @Inject constructor(private val notesRepository: NotesRepository) :
-        () -> Flow<List<Note>> by notesRepository::getNotes
+class GetNoteByIdUseCase @Inject constructor(private val notesRepository: NotesRepository) :
+        (String) -> Flow<Note> by notesRepository::getNoteById
