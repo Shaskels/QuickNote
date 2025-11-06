@@ -45,7 +45,7 @@ fun NoteScreen(
     Scaffold(
         containerColor = NoteTheme.colors.backgroundColor,
         topBar = {
-            TopBar(
+            TopBarWithNavigation(
                 onBackClick = onBackClick,
                 onSaveClick = onSaveClick
             )
@@ -98,7 +98,7 @@ fun NoteScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(onBackClick: () -> Unit, onSaveClick: () -> Unit) {
+private fun TopBarWithNavigation(onBackClick: () -> Unit, onSaveClick: () -> Unit) {
     TopAppBar(
         title = {},
         navigationIcon = {

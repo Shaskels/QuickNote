@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.quicknote.di.Notes
 import com.example.quicknote.domain.Note
+import com.example.quicknote.domain.Sorts
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -15,11 +16,17 @@ class NotesDataSource @Inject constructor(
     @Notes private val dataStore: DataStore<Preferences>
 ) {
 
-    fun getNotesByQuery(query: String): Flow<List<Note>> {
+    fun getNotesByQuery(query: String, sorts: Sorts): Flow<List<Note>> {
         return dataStore.data.map { preferences ->
-            preferences.asMap().map { mapEntry ->
+            var notes = preferences.asMap().map { mapEntry ->
                 Json.decodeFromString<Note>(mapEntry.value.toString())
             }.filter { note -> "${note.value} ${note.headline}".contains(query) }
+            if (sorts.sortByHeadline) {
+                notes = notes.sortedBy { note -> note.headline }
+            } else if (sorts.sortByDate) {
+                notes = notes.sortedBy { note -> note.timeOfChange }
+            }
+            notes
         }
     }
 

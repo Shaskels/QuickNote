@@ -2,6 +2,7 @@ package com.example.quicknote.data.repository
 
 import com.example.quicknote.data.datasource.NotesDataSource
 import com.example.quicknote.domain.Note
+import com.example.quicknote.domain.Sorts
 import com.example.quicknote.domain.repository.NotesRepository
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -9,8 +10,11 @@ import kotlinx.coroutines.flow.Flow
 class NotesRepositoryImpl @Inject constructor(private val notesDataSource: NotesDataSource) :
     NotesRepository {
 
-    override fun getNotesByQuery(query: String): Flow<List<Note>> {
-        return notesDataSource.getNotesByQuery(query)
+    override fun getNotesByQuery(
+        query: String,
+        sorts: Sorts
+    ): Flow<List<Note>> {
+        return notesDataSource.getNotesByQuery(query, sorts)
     }
 
     override suspend fun saveNote(note: Note) {

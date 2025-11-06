@@ -1,10 +1,14 @@
 package com.example.quicknote.domain.repository
 
 import com.example.quicknote.domain.Note
+import com.example.quicknote.domain.Sorts
 import kotlinx.coroutines.flow.Flow
 
 interface NotesRepository {
-    fun getNotesByQuery(query: String): Flow<List<Note>>
+    fun getNotesByQuery(
+        query: String,
+        sorts: Sorts,
+    ): Flow<List<Note>>
 
     suspend fun saveNote(note: Note)
 
