@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.quicknote.R
+import com.example.quicknote.data.entity.formatter
 import com.example.quicknote.domain.Note
 import com.example.quicknote.ui.component.BrandTextField
 import com.example.quicknote.ui.theme.NoteTheme
@@ -74,7 +75,7 @@ fun NoteScreen(
             )
 
             Text(
-                text = note.timeOfChange,
+                text = note.timeOfChange.format(formatter),
                 color = NoteTheme.colors.textLight,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(start = 15.dp)

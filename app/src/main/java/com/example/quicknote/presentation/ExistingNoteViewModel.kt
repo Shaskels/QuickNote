@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.quicknote.domain.Note
 import com.example.quicknote.domain.usecase.GetNoteByIdUseCase
 import com.example.quicknote.domain.usecase.UpdateNoteUseCase
-import com.example.quicknote.util.getCurrentTime
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -16,6 +15,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 @HiltViewModel(assistedFactory = ExistingNoteViewModel.NoteViewModelFactory::class)
 class ExistingNoteViewModel @AssistedInject constructor(
@@ -56,7 +56,7 @@ class ExistingNoteViewModel @AssistedInject constructor(
             if (_noteState.value is NoteState.Content && ((_noteState.value as NoteState.Content).note.headline.isNotEmpty()
                         || (_noteState.value as NoteState.Content).note.value.isNotEmpty())
             ) {
-                updateNoteUseCase((_noteState.value as NoteState.Content).note.copy(timeOfChange = getCurrentTime()))
+                updateNoteUseCase((_noteState.value as NoteState.Content).note)
             }
         }
     }
@@ -70,7 +70,7 @@ class ExistingNoteViewModel @AssistedInject constructor(
     }
 
     fun getEmptyNote(): Note {
-        return Note(value = "", headline = "", timeOfChange = getCurrentTime())
+        return Note(id = "", value = "", headline = "", timeOfChange = LocalDateTime.now())
     }
 
     @AssistedFactory

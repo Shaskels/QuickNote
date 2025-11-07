@@ -4,13 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quicknote.domain.Note
 import com.example.quicknote.domain.usecase.SaveNoteUseCase
-import com.example.quicknote.util.getCurrentTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 @HiltViewModel
 class NewNoteViewModel @Inject constructor(
@@ -25,7 +25,7 @@ class NewNoteViewModel @Inject constructor(
             if (_noteState.value is NoteState.Content && ((_noteState.value as NoteState.Content).note.headline.isNotEmpty()
                         || (_noteState.value as NoteState.Content).note.value.isNotEmpty())
             ) {
-                saveNoteUseCase((_noteState.value as NoteState.Content).note.copy(timeOfChange = getCurrentTime()))
+                saveNoteUseCase((_noteState.value as NoteState.Content).note)
             }
         }
     }
@@ -51,7 +51,7 @@ class NewNoteViewModel @Inject constructor(
     }
 
     fun getEmptyNote(): Note {
-        return Note(value = "", headline = "", timeOfChange = getCurrentTime())
+        return Note(id = "", value = "", headline = "", timeOfChange = LocalDateTime.now())
     }
 
 }
