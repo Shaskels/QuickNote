@@ -1,11 +1,8 @@
 package com.example.quicknote.data.entity
 
 import com.example.quicknote.domain.Note
+import com.example.quicknote.util.formatter
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
-
-var formatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm")
 
 fun NoteModel.toNote(): Note = Note(
     this.id,

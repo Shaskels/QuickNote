@@ -26,10 +26,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.quicknote.R
-import com.example.quicknote.data.entity.formatter
 import com.example.quicknote.domain.Note
 import com.example.quicknote.ui.component.BrandTextField
 import com.example.quicknote.ui.theme.NoteTheme
+import com.example.quicknote.util.formatter
 
 @Composable
 fun NoteScreen(

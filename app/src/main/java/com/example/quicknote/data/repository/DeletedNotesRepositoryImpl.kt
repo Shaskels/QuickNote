@@ -13,7 +13,7 @@ class DeletedNotesRepositoryImpl @Inject constructor(private val deletedNotesDat
     DeletedNotesRepository {
 
     override fun getNotes(): Flow<List<Note>> =
-        deletedNotesDataSource.notes.map { it.map { it.toNote() } }
+        deletedNotesDataSource.notes.map { noteModels -> noteModels.map { it.toNote() } }
 
     override suspend fun saveNote(note: Note) {
         deletedNotesDataSource.saveNote(note.toNoteModel())
