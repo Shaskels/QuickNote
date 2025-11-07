@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Done
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -31,6 +29,7 @@ import com.example.quicknote.R
 import com.example.quicknote.domain.Note
 import com.example.quicknote.ui.component.BrandTextField
 import com.example.quicknote.ui.theme.NoteTheme
+import com.example.quicknote.util.formatter
 
 @Composable
 fun NoteScreen(
@@ -45,7 +44,7 @@ fun NoteScreen(
     Scaffold(
         containerColor = NoteTheme.colors.backgroundColor,
         topBar = {
-            TopBar(
+            TopBarWithNavigation(
                 onBackClick = onBackClick,
                 onSaveClick = onSaveClick
             )
@@ -76,7 +75,7 @@ fun NoteScreen(
             )
 
             Text(
-                text = note.timeOfChange,
+                text = note.timeOfChange.format(formatter),
                 color = NoteTheme.colors.textLight,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(start = 15.dp)
@@ -98,13 +97,13 @@ fun NoteScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(onBackClick: () -> Unit, onSaveClick: () -> Unit) {
+private fun TopBarWithNavigation(onBackClick: () -> Unit, onSaveClick: () -> Unit) {
     TopAppBar(
         title = {},
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(
-                    imageVector = Icons.Rounded.ArrowBack,
+                    painter = painterResource(R.drawable.arrow_back_24dp),
                     contentDescription = stringResource(R.string.back_to_note_list)
                 )
             }
@@ -112,7 +111,7 @@ private fun TopBar(onBackClick: () -> Unit, onSaveClick: () -> Unit) {
         actions = {
             IconButton(onClick = onSaveClick) {
                 Icon(
-                    imageVector = Icons.Rounded.Done,
+                    painter = painterResource(R.drawable.check_24dp),
                     contentDescription = stringResource(R.string.note_done)
                 )
             }

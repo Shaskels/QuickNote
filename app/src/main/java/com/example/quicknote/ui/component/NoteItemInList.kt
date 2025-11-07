@@ -14,6 +14,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.quicknote.domain.Note
 import com.example.quicknote.ui.theme.NoteTheme
+import com.example.quicknote.util.formatter
 
 @Composable
 fun NoteItemInList(
@@ -37,6 +38,7 @@ fun NoteItemInList(
         Text(
             note.headline,
             color = NoteTheme.colors.textPrimary,
+            style = MaterialTheme.typography.titleSmall,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
             modifier = Modifier
@@ -53,7 +55,7 @@ fun NoteItemInList(
         )
 
         Text(
-            note.timeOfChange,
+            note.timeOfChange.format(formatter),
             color = NoteTheme.colors.textLight,
             maxLines = 1,
             style = MaterialTheme.typography.labelSmall,

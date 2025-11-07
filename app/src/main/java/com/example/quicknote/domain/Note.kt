@@ -1,15 +1,12 @@
 package com.example.quicknote.domain
 
-import kotlinx.serialization.Serializable
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
+import java.time.LocalDateTime
 
-@Serializable
-data class Note @OptIn(ExperimentalUuidApi::class) constructor(
-    val id: String = Uuid.random().toString(),
+data class Note(
+    val id: String,
     val headline: String,
     val value: String,
-    val timeOfChange: String
+    val timeOfChange: LocalDateTime
 )
 
 

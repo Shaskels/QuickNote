@@ -7,4 +7,12 @@
     <string name="note_done">Note done</string>
     <string name="save">Save</string>
     <string name="trash">Trash</string>
+    <string name="add_note">Add note</string>
+    <string name="are_you_sure_you_want_to_delete">Are you sure you want to delete?</string>
+    <string name="undo">Undo</string>
+    <string name="sort_by">Sort by</string>
+    <string name="headline_label">headline</string>
+    <string name="date_label">date</string>
+    <string name="apply_sort">Apply sort</string>
+    <string name="notes_search">Notes search</string>
 </resources>

@@ -20,6 +20,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.quicknote.R
 import com.example.quicknote.presentation.DeletedNoteListViewModel
 import com.example.quicknote.ui.component.NoteItemInList
+import com.example.quicknote.ui.theme.NoteTheme
 
 @Composable
 fun TrashScreen(
@@ -34,7 +35,8 @@ fun TrashScreen(
         Text(
             text = stringResource(R.string.trash),
             modifier = Modifier.padding(vertical = 15.dp, horizontal = 15.dp),
-            style = MaterialTheme.typography.titleLarge
+            color = NoteTheme.colors.textPrimary,
+            style = MaterialTheme.typography.titleLarge,
         )
 
         LazyVerticalStaggeredGrid(

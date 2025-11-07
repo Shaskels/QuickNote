@@ -5,8 +5,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.example.quicknote.data.entity.NoteModel
+import com.example.quicknote.data.entity.toNote
 import com.example.quicknote.di.Notes
 import com.example.quicknote.domain.Note
+import com.example.quicknote.domain.Sorts
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -16,14 +19,22 @@ class NotesDataSource @Inject constructor(
     @Notes private val dataStore: DataStore<Preferences>
 ) {
 
-    val notes: Flow<List<Note>> = dataStore.data.map { preferences ->
-        preferences.asMap().map { mapEntry ->
-            Log.d("fsdfsdf", mapEntry.value.toString())
-            Json.decodeFromString<Note>(mapEntry.value.toString())
+    fun getNotesByQuery(query: String, sorts: Sorts): Flow<List<Note>> {
+        return dataStore.data.map { preferences ->
+            var notes = preferences.asMap().map { mapEntry ->
+                Json.decodeFromString<NoteModel>(mapEntry.value.toString()).toNote()
+            }.filter { note -> "${note.value} ${note.headline}".contains(query) }
+            if (sorts.sortByHeadline) {
+                notes = notes.sortedBy { note -> note.headline }
+            } else if (sorts.sortByDate) {
+                notes = notes.sortedBy { note -> note.timeOfChange }
+            }
+            notes
         }
     }
 
-    suspend fun saveNote(note: Note) {
+    suspend fun saveNote(note: NoteModel) {
+        Log.d("SaveNote", note.timeOfChange)
         dataStore.edit { preferences ->
             val prefKey = stringPreferencesKey(note.id)
             preferences[prefKey] = Json.encodeToString(note)
@@ -37,10 +48,10 @@ class NotesDataSource @Inject constructor(
         }
     }
 
-    fun getNoteByKey(key: String): Flow<Note> {
+    fun getNoteByKey(key: String): Flow<NoteModel> {
         val prefKey = stringPreferencesKey(key)
         return dataStore.data.map { preferences ->
-            Json.decodeFromString<Note>(
+            Json.decodeFromString<NoteModel>(
                 preferences[prefKey] ?: ""
             )
         }
