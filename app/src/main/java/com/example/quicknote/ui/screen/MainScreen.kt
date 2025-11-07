@@ -1,9 +1,10 @@
 package com.example.quicknote.ui.screen
 
-import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -50,7 +51,6 @@ fun MainScreen() {
     val screenHeight = displayMetrics.heightPixels
     val screenWidth = displayMetrics.widthPixels
 
-
     Scaffold(
         containerColor = NoteTheme.colors.backgroundColor,
         snackbarHost = {
@@ -92,11 +92,14 @@ fun MainScreen() {
                 navController = navController,
                 startDestination = Route.NoteList,
             ) {
-                composable<Route.NoteList> {
+                composable<Route.NoteList>(
+                    enterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
+                    exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) }
+                ) {
                     NoteListScreen(
                         snackbarHostState = snackbarHostState,
-                        onNoteClick = { noteId, x, y ->
-                            navController.navigate(Route.ExistingNote(noteId, x, y))
+                        onNoteClick = { noteId, touchX, touchY ->
+                            navController.navigate(Route.ExistingNote(noteId, touchX, touchY))
                         },
                         onAddNoteClick = {
                             navController.navigate(Route.NewNote)
@@ -116,7 +119,7 @@ fun MainScreen() {
                 composable<Route.NewNote>(
                     enterTransition = {
                         scaleIn(
-                            tween(700),
+                            tween(500),
                             transformOrigin = TransformOrigin(1f, 1f)
                         )
                     },
@@ -130,10 +133,10 @@ fun MainScreen() {
                     enterTransition = {
                         val note = this.targetState.toRoute<Route.ExistingNote>()
                         scaleIn(
-                            tween(700),
+                            tween(500),
                             transformOrigin = TransformOrigin(
-                                note.x / screenWidth,
-                                note.y / screenHeight
+                                note.touchX / screenWidth,
+                                note.touchY / screenHeight
                             )
                         )
                     },
@@ -150,7 +153,10 @@ fun MainScreen() {
                         onBackClick = { navController.navigateUp() }
                     )
                 }
-                composable<Route.DeletedNoteList>() {
+                composable<Route.DeletedNoteList>(
+                    enterTransition = { slideInHorizontally { it } },
+                    exitTransition = { slideOutHorizontally { -it } }
+                ) {
                     TrashScreen()
                 }
             }
@@ -178,7 +184,6 @@ private fun showSnackbar(
         when (result) {
             SnackbarResult.ActionPerformed -> onActionPerformed()
             SnackbarResult.Dismissed -> {
-                Log.d("Snackbar", " Dismiss")
                 onDismiss()
             }
         }

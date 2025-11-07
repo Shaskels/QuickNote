@@ -10,14 +10,14 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = NoteColors(
-    backgroundColor = Background,
-    noteBackground = NoteBackground,
-    textPrimary = TextPrimary,
+    backgroundColor = BackgroundDark,
+    noteBackground = NoteBackgroundDark,
+    textPrimary = TextPrimaryDark,
     backgroundBrand = BackgroundBrand,
     textSecondary = TextSecondary,
     textLight = TextLight,
     selectionColor = SelectionColor,
-    backgroundSecondary = BackgroundSecondary,
+    backgroundSecondary = BackgroundSecondaryDark,
 )
 
 private val LightColorScheme = NoteColors(

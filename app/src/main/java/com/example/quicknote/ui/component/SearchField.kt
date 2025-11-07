@@ -2,9 +2,6 @@ package com.example.quicknote.ui.component
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.TextSelectionColors
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Clear
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -12,7 +9,9 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.quicknote.R
 import com.example.quicknote.ui.theme.NoteTheme
 
 @Composable
@@ -30,11 +29,11 @@ fun SearchField(
             Text("Notes search")
         },
         leadingIcon = {
-            Icon(Icons.Rounded.Search, contentDescription = "")
+            Icon(painterResource(R.drawable.search_24dp), contentDescription = null)
         },
         trailingIcon = {
             IconButton(onClick = onClearQueryClick) {
-                Icon(Icons.Rounded.Clear, contentDescription = "")
+                Icon(painterResource(R.drawable.close_24dp), contentDescription = null)
             }
         },
         singleLine = true,

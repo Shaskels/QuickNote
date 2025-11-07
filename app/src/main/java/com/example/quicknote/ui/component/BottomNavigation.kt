@@ -1,15 +1,13 @@
 package com.example.quicknote.ui.component
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.icons.rounded.List
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.quicknote.R
 import com.example.quicknote.ui.screen.NavigationOptions
@@ -29,7 +27,7 @@ fun BottomNavigation(
             NavigationBarItem(
                 selected = selectedNavigationOption == option,
                 onClick = { onItemClicked(option) },
-                icon = { Icon(imageVector = getIcon(option), "") },
+                icon = { Icon(painter = getIcon(option), null) },
                 label = {
                     Text(
                         text = getLabel(option),
@@ -50,10 +48,10 @@ fun BottomNavigation(
 }
 
 @Composable
-private fun getIcon(option: NavigationOptions): ImageVector =
+private fun getIcon(option: NavigationOptions): Painter =
     when (option) {
-        NavigationOptions.NOTE_LIST -> Icons.Rounded.List
-        NavigationOptions.DELETED_NOTE_LIST -> Icons.Rounded.Delete
+        NavigationOptions.NOTE_LIST -> painterResource(R.drawable.list_24dp)
+        NavigationOptions.DELETED_NOTE_LIST -> painterResource(R.drawable.delete_24dp)
     }
 
 @Composable

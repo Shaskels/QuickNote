@@ -1,10 +1,9 @@
 package com.example.quicknote.ui.component
 
+
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -12,8 +11,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.quicknote.R
 import com.example.quicknote.ui.theme.NoteTheme
 
 @Composable
@@ -32,8 +34,8 @@ fun CustomChip(
         leadingIcon = if (selected) {
             {
                 Icon(
-                    imageVector = Icons.Filled.Done,
-                    contentDescription = "Done icon",
+                    painter = painterResource(R.drawable.check_24dp),
+                    contentDescription = stringResource(R.string.apply_sort),
                     modifier = Modifier.size(FilterChipDefaults.IconSize)
                 )
             }

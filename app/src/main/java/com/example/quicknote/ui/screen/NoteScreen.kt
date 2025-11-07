@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Done
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -104,7 +102,7 @@ private fun TopBarWithNavigation(onBackClick: () -> Unit, onSaveClick: () -> Uni
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(
-                    imageVector = Icons.Rounded.ArrowBack,
+                    painter = painterResource(R.drawable.arrow_back_24dp),
                     contentDescription = stringResource(R.string.back_to_note_list)
                 )
             }
@@ -112,7 +110,7 @@ private fun TopBarWithNavigation(onBackClick: () -> Unit, onSaveClick: () -> Uni
         actions = {
             IconButton(onClick = onSaveClick) {
                 Icon(
-                    imageVector = Icons.Rounded.Done,
+                    painter = painterResource(R.drawable.check_24dp),
                     contentDescription = stringResource(R.string.note_done)
                 )
             }

@@ -53,7 +53,9 @@ class ExistingNoteViewModel @AssistedInject constructor(
 
     fun updateNote() {
         viewModelScope.launch {
-            if (_noteState.value is NoteState.Content) {
+            if (_noteState.value is NoteState.Content && ((_noteState.value as NoteState.Content).note.headline.isNotEmpty()
+                        || (_noteState.value as NoteState.Content).note.value.isNotEmpty())
+            ) {
                 updateNoteUseCase((_noteState.value as NoteState.Content).note.copy(timeOfChange = getCurrentTime()))
             }
         }

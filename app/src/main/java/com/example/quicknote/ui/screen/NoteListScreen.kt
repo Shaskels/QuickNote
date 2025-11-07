@@ -1,13 +1,16 @@
 package com.example.quicknote.ui.screen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
@@ -28,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -104,7 +108,7 @@ fun Screen(
             if (screenState.contentState is NoteListScreenState.ContentState.NoteList) {
                 AddButton(
                     onClick = onAddNoteClick,
-                    description = "add note",
+                    description = stringResource(R.string.add_note),
                     modifier = Modifier.padding(bottom = 15.dp, end = 15.dp)
                 )
             }
@@ -153,6 +157,19 @@ fun Screen(
                     noteListViewModel::noneSort,
                     modifier = Modifier.padding(horizontal = 10.dp)
                 )
+            }
+
+            if (screenState.notes.isEmpty()) {
+                Spacer(modifier = Modifier.weight(1f))
+                Image(
+                    painter = painterResource(R.drawable.no_notes),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .size(70.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
+                Spacer(modifier = Modifier.weight(1f))
             }
 
             LazyVerticalStaggeredGrid(
@@ -220,7 +237,11 @@ fun SortBox(
     Column(
         modifier = modifier
     ) {
-        Text("Sort by", modifier = Modifier.padding(start = 5.dp))
+        Text(
+            stringResource(R.string.sort_by),
+            color = NoteTheme.colors.textPrimary,
+            modifier = Modifier.padding(start = 5.dp)
+        )
 
         ChipSortGroup(sortState, onSortByHeadline, onSortByDate, onNoteSort)
     }
@@ -247,7 +268,7 @@ fun ChipSortGroup(
                     onSortByHeadline()
                 }
             },
-            label = "headline",
+            label = stringResource(R.string.headline_label),
             modifier = Modifier.weight(1f),
         )
 
@@ -260,7 +281,7 @@ fun ChipSortGroup(
                     onSortByDate()
                 }
             },
-            label = "date",
+            label = stringResource(R.string.date_label),
             modifier = Modifier.weight(1f)
         )
     }

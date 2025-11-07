@@ -9,5 +9,9 @@ val NoteBackground = Color(0xFFffffff)
 val TextPrimary = Color(0xFF1d1d1d)
 val TextSecondary = Color(0XFF666666)
 val TextLight = Color(0xFFaaaaaa)
-
 val BackgroundSecondary = Color(0xFFe8e8e8)
+
+val BackgroundDark = Color(0xFF000000)
+val TextPrimaryDark = Color(0xFFffffff)
+val NoteBackgroundDark = Color(0xFF242424)
+val BackgroundSecondaryDark = Color(0xFF242424)
