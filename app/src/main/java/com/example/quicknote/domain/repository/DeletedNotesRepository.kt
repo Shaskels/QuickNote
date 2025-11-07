@@ -11,4 +11,6 @@ interface DeletedNotesRepository {
 
     suspend fun deleteNote(id: String)
 
+    suspend fun deleteAllNotes()
+
 }

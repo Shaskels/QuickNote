@@ -22,4 +22,8 @@ class DeletedNotesRepositoryImpl @Inject constructor(private val deletedNotesDat
     override suspend fun deleteNote(id: String) {
         deletedNotesDataSource.deleteNote(id)
     }
+
+    override suspend fun deleteAllNotes() {
+        deletedNotesDataSource.deleteAllNotes()
+    }
 }

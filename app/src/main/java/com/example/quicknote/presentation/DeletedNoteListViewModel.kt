@@ -3,6 +3,7 @@ package com.example.quicknote.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quicknote.domain.Note
+import com.example.quicknote.domain.usecase.ClearDeletedNotesUseCase
 import com.example.quicknote.domain.usecase.DeleteDeletedNotesUseCase
 import com.example.quicknote.domain.usecase.GetDeletedNotesUseCase
 import com.example.quicknote.domain.usecase.SaveNoteUseCase
@@ -15,6 +16,7 @@ class DeletedNoteListViewModel @Inject constructor(
     getDeletedNotesUseCase: GetDeletedNotesUseCase,
     private val deleteDeletedNotesUseCase: DeleteDeletedNotesUseCase,
     private val saveNoteUseCase: SaveNoteUseCase,
+    private val clearDeletedNotesUseCase: ClearDeletedNotesUseCase,
 ) : ViewModel() {
 
     val deletedNotesFlow = getDeletedNotesUseCase()
@@ -29,6 +31,12 @@ class DeletedNoteListViewModel @Inject constructor(
         viewModelScope.launch {
             deleteDeletedNotesUseCase(note.id)
             saveNoteUseCase(note)
+        }
+    }
+
+    fun clearTrash() {
+        viewModelScope.launch {
+            clearDeletedNotesUseCase()
         }
     }
 }
