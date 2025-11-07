@@ -155,15 +155,13 @@ fun MainScreen() {
                 }
                 composable<Route.DeletedNoteList>(
                     enterTransition = { slideInHorizontally { it } },
-                    exitTransition = { slideOutHorizontally { -it } }
+                    exitTransition = { slideOutHorizontally { it } }
                 ) {
                     TrashScreen()
                 }
             }
-
         }
     }
-
 }
 
 private fun showSnackbar(

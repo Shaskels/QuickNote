@@ -34,4 +34,9 @@ class DeletedNotesDataSource @Inject constructor(
         }
     }
 
+    suspend fun deleteAllNotes() {
+        dataStore.edit { preferences ->
+            preferences.clear()
+        }
+    }
 }

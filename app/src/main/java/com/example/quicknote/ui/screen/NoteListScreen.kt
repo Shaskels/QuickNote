@@ -14,16 +14,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -47,6 +42,7 @@ import com.example.quicknote.ui.component.AddButton
 import com.example.quicknote.ui.component.CustomChip
 import com.example.quicknote.ui.component.NoteItemInList
 import com.example.quicknote.ui.component.SearchField
+import com.example.quicknote.ui.component.TopBarWithAction
 import com.example.quicknote.ui.theme.NoteTheme
 
 @Composable
@@ -95,12 +91,18 @@ fun Screen(
         topBar = {
             TopBarWithAction(
                 title = stringResource(R.string.notes),
-                onSortClick = {
+                onActionClick = {
                     if (screenState.sortState is NoteListScreenState.SortState.NotShown) {
                         noteListViewModel.showSortOptions()
                     } else {
                         noteListViewModel.hideSortOptions()
                     }
+                },
+                icon = {
+                    Icon(
+                        painter = painterResource(R.drawable.filter_list_24dp),
+                        contentDescription = stringResource(R.string.sort_by)
+                    )
                 }
             )
         },
@@ -198,32 +200,6 @@ fun Screen(
             }
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopBarWithAction(title: String, onSortClick: () -> Unit) {
-    TopAppBar(
-        title = {
-            Text(text = title, style = MaterialTheme.typography.titleLarge)
-        },
-        actions = {
-            IconButton(onClick = onSortClick) {
-                Icon(
-                    painter = painterResource(R.drawable.filter_list_24dp),
-                    contentDescription = stringResource(R.string.note_done)
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = NoteTheme.colors.backgroundColor,
-            navigationIconContentColor = NoteTheme.colors.textPrimary,
-            actionIconContentColor = NoteTheme.colors.textPrimary,
-            titleContentColor = NoteTheme.colors.textPrimary,
-        ),
-        windowInsets = WindowInsets(top = 0.dp),
-        modifier = Modifier.fillMaxWidth()
-    )
 }
 
 @Composable
