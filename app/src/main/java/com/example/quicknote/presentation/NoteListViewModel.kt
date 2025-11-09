@@ -14,13 +14,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -40,33 +41,34 @@ class NoteListViewModel @Inject constructor(
 
     private val sortState = MutableStateFlow(Sorts(sortByHeadline = false, sortByDate = false))
     private val queryState = MutableStateFlow("")
+    val deletedNotesFlow = getDeletedNotesUseCase()
+    val filtersFlow = combine(
+        sortState,
+        queryState.debounce(300),
+        deletedNotesFlow
+    ) { sorts, query, deletedNotes ->
+        getNotesByQuerySorted(query, sorts, deletedNotes)
+    }
 
     private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
         _screenState.value = NoteListScreenState.Error
         Log.d("NoteListViewModel", throwable.message.toString())
     }
 
-    val deletedNotesFlow = getDeletedNotesUseCase()
-
     init {
         _screenState.value = NoteListScreenState.Content(
             emptyList(), NoteListScreenState.ContentState.NoteList,
             NoteListScreenState.SortState.NotShown
         )
-        getNotesByQuerySorted("", Sorts(sortByHeadline = false, sortByDate = false))
-        queryState.setUpQueryFlow()
+        getNotesByQuerySorted("", Sorts(sortByHeadline = false, sortByDate = false), emptyList())
+        filtersFlow.setUpFiltersFlow()
     }
 
-    fun getNotesByQuerySorted(query: String, sorts: Sorts) {
+    fun getNotesByQuerySorted(query: String, sorts: Sorts, deletedNotes: List<Note>) {
         viewModelScope.launch(exceptionHandler) {
-            Log.d(
-                "NoteListViewModel",
-                "query: $query sorts: ${sorts.sortByHeadline} ${sorts.sortByDate}"
-            )
-            getNotesUseCase(query, sorts)
-                .combine(deletedNotesFlow) { notes, deletedNotes ->
-                    notes.filter { note -> deletedNotes.firstOrNull { note.id == it.id } == null }
-                }
+            getNotesUseCase(query, sorts).map { notes ->
+                notes.filter { note -> deletedNotes.firstOrNull { note.id == it.id } == null }
+            }
                 .flowOn(Dispatchers.Default)
                 .onEach {
                     _screenState.update { currentState ->
@@ -80,12 +82,9 @@ class NoteListViewModel @Inject constructor(
     }
 
     @OptIn(FlowPreview::class)
-    private fun MutableSharedFlow<String>.setUpQueryFlow() {
+    private fun Flow<Unit>.setUpFiltersFlow() {
         viewModelScope.launch(exceptionHandler) {
-            this@setUpQueryFlow.debounce(300).combine(sortState) { query, sorts ->
-                getNotesByQuerySorted(query, sorts)
-            }
-                .collect()
+            this@setUpFiltersFlow.collect()
         }
     }
 

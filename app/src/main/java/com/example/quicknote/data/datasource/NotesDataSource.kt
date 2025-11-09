@@ -27,7 +27,7 @@ class NotesDataSource @Inject constructor(
             if (sorts.sortByHeadline) {
                 notes = notes.sortedBy { note -> note.headline }
             } else if (sorts.sortByDate) {
-                notes = notes.sortedBy { note -> note.timeOfChange }
+                notes = notes.sortedByDescending { note -> note.timeOfChange }
             }
             notes
         }
