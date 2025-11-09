@@ -35,24 +35,28 @@ fun NoteItemInList(
             .background(color = NoteTheme.colors.noteBackground)
             .padding(12.dp)
     ) {
-        Text(
-            note.headline,
-            color = NoteTheme.colors.textPrimary,
-            style = MaterialTheme.typography.titleSmall,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
-            modifier = Modifier
-                .padding(bottom = 10.dp),
-        )
+        if (note.headline.isNotEmpty()) {
+            Text(
+                note.headline,
+                color = NoteTheme.colors.textPrimary,
+                style = MaterialTheme.typography.titleSmall,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                modifier = Modifier
+                    .padding(bottom = 10.dp),
+            )
+        }
 
-        Text(
-            note.value,
-            color = NoteTheme.colors.textSecondary,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 4,
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(bottom = 10.dp),
-        )
+        if (note.value.isNotEmpty()) {
+            Text(
+                note.value,
+                color = NoteTheme.colors.textSecondary,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 4,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(bottom = 10.dp),
+            )
+        }
 
         Text(
             note.timeOfChange.format(formatter),

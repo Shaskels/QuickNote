@@ -85,8 +85,6 @@ fun NoteScreen(
                 value = note.value,
                 onValueChanged = onValueChanged,
                 hint = stringResource(R.string.enter_your_note),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = { onSaveClick() }),
                 modifier = Modifier
                     .fillMaxWidth()
             )

@@ -17,9 +17,9 @@ fun BrandTextField(
     value: String,
     onValueChanged: (String) -> Unit,
     hint: String,
-    keyboardActions: KeyboardActions,
-    keyboardOptions: KeyboardOptions,
     modifier: Modifier = Modifier,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     textStyle: TextStyle = LocalTextStyle.current,
 ) {
     TextField(
