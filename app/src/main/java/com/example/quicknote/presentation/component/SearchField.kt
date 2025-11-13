@@ -1,0 +1,69 @@
+package com.example.quicknote.presentation.component
+
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.dp
+import com.example.quicknote.R
+import com.example.quicknote.presentation.theme.NoteTheme
+
+@Composable
+fun SearchField(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onClearQueryClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TextField(
+        value = query,
+        onValueChange = onQueryChange,
+        shape = RoundedCornerShape(25.dp),
+        placeholder = {
+            Text(stringResource(R.string.notes_search))
+        },
+        leadingIcon = {
+            Icon(painterResource(R.drawable.search_24dp), contentDescription = null)
+        },
+        trailingIcon = {
+            IconButton(onClick = onClearQueryClick) {
+                Icon(painterResource(R.drawable.close_24dp), contentDescription = null)
+            }
+        },
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(onSearch = {
+            onQueryChange(query)
+        }),
+        singleLine = true,
+        colors = TextFieldDefaults.colors(
+            cursorColor = NoteTheme.colors.backgroundBrand,
+            focusedTextColor = NoteTheme.colors.textPrimary,
+            unfocusedTextColor = NoteTheme.colors.textPrimary,
+            focusedContainerColor = NoteTheme.colors.backgroundSecondary,
+            unfocusedContainerColor = NoteTheme.colors.backgroundSecondary,
+            focusedPlaceholderColor = NoteTheme.colors.textLight,
+            unfocusedPlaceholderColor = NoteTheme.colors.textLight,
+            focusedIndicatorColor = NoteTheme.colors.backgroundSecondary,
+            unfocusedIndicatorColor = NoteTheme.colors.backgroundSecondary,
+            focusedLeadingIconColor = NoteTheme.colors.textLight,
+            unfocusedLeadingIconColor = NoteTheme.colors.textLight,
+            focusedTrailingIconColor = NoteTheme.colors.textLight,
+            unfocusedTrailingIconColor = NoteTheme.colors.textLight,
+            selectionColors = TextSelectionColors(
+                handleColor = NoteTheme.colors.backgroundBrand,
+                backgroundColor = NoteTheme.colors.selectionColor
+            )
+        ),
+        modifier = modifier,
+    )
+}

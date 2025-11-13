@@ -57,7 +57,8 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.compose.navigation)
     implementation(libs.kotlinx.serialization.json)
-
+    implementation(libs.kotlinx.datetime)
+    implementation(libs.jakewharton.timber)
 
     androidTestImplementation(platform(libs.androidx.compose.bom))
     debugImplementation(libs.androidx.compose.ui.tooling)
