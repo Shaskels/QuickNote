@@ -6,5 +6,8 @@ import com.example.quicknote.domain.repository.NotesRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetNotesUseCase @Inject constructor(private val notesRepository: NotesRepository) :
-        (String, Sorts) -> Flow<List<Note>> by notesRepository::getNotesByQuery
+class GetNotesUseCase @Inject constructor(private val notesRepository: NotesRepository) {
+    operator fun invoke(query: String, sorts: Sorts): Flow<List<Note>> {
+        return notesRepository.getNotesByQuery(query, sorts)
+    }
+}
