@@ -1,6 +1,6 @@
 package com.example.quicknote.domain
 
-import java.time.LocalDateTime
+import kotlinx.datetime.LocalDateTime
 
 data class Note(
     val id: String,
