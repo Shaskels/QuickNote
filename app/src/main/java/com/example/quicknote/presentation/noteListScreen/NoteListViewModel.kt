@@ -73,7 +73,6 @@ class NoteListViewModel @Inject constructor(
             getNotesUseCase(query, sorts).map { notes ->
                 notes.filter { note -> deletedNotes.firstOrNull { note.id == it.id } == null }
             }
-                .flowOn(Dispatchers.Default)
                 .onEach {
                     _screenState.update { currentState ->
                         (currentState as NoteListScreenState.Content).copy(
@@ -81,6 +80,7 @@ class NoteListViewModel @Inject constructor(
                         )
                     }
                 }
+                .flowOn(Dispatchers.Default)
                 .collect()
         }
     }
