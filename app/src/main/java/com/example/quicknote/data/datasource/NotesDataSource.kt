@@ -1,6 +1,5 @@
 package com.example.quicknote.data.datasource
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -11,16 +10,23 @@ import com.example.quicknote.di.Notes
 import com.example.quicknote.domain.Note
 import com.example.quicknote.domain.Sorts
 import jakarta.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
+import timber.log.Timber
 
 class NotesDataSource @Inject constructor(
     @Notes private val dataStore: DataStore<Preferences>
 ) {
 
+    private val preferencesFlow = dataStore.data
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun getNotesByQuery(query: String, sorts: Sorts): Flow<List<Note>> {
-        return dataStore.data.map { preferences ->
+        return preferencesFlow.flatMapLatest { preferences ->
             var notes = preferences.asMap().map { mapEntry ->
                 Json.decodeFromString<NoteModel>(mapEntry.value.toString()).toNote()
             }.filter { note -> "${note.value} ${note.headline}".contains(query) }
@@ -29,12 +35,12 @@ class NotesDataSource @Inject constructor(
             } else if (sorts.sortByDate) {
                 notes = notes.sortedByDescending { note -> note.timeOfChange }
             }
-            notes
+            flowOf(notes)
         }
     }
 
     suspend fun saveNote(note: NoteModel) {
-        Log.d("SaveNote", note.timeOfChange)
+        Timber.tag("SaveNote").d(note.timeOfChange)
         dataStore.edit { preferences ->
             val prefKey = stringPreferencesKey(note.id)
             preferences[prefKey] = Json.encodeToString(note)
@@ -50,7 +56,7 @@ class NotesDataSource @Inject constructor(
 
     fun getNoteByKey(key: String): Flow<NoteModel> {
         val prefKey = stringPreferencesKey(key)
-        return dataStore.data.map { preferences ->
+        return preferencesFlow.map { preferences ->
             Json.decodeFromString<NoteModel>(
                 preferences[prefKey] ?: ""
             )
