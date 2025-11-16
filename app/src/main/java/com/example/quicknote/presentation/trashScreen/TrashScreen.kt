@@ -62,7 +62,9 @@ fun TrashScreen(
                     NoteItemInList(
                         note = item,
                         onClick = { deletedNoteListViewModel.restoreDeletedNote(item) },
-                        onLongClick = { deletedNoteListViewModel.deleteNoteFromTrash(item.id) },
+                        onLongClick = {},
+                        withSelection = false,
+                        selected = false,
                     )
                 }
             }
