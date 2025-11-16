@@ -16,4 +16,5 @@
     <string name="apply_sort">Apply sort</string>
     <string name="notes_search">Notes search</string>
     <string name="delete_all">Delete all</string>
+    <string name="selected">Selected</string>
 </resources>

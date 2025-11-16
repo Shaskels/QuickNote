@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,10 +41,12 @@ import com.example.quicknote.presentation.component.CustomChip
 import com.example.quicknote.presentation.component.NoteItemInList
 import com.example.quicknote.presentation.component.SearchField
 import com.example.quicknote.presentation.component.TopBarWithAction
+import com.example.quicknote.presentation.component.TopBarWithCancel
 import com.example.quicknote.presentation.mainScreen.CustomSnackbarHost
 import com.example.quicknote.presentation.mainScreen.showSnackbar
 import com.example.quicknote.presentation.noteListScreen.screenState.ContentState
 import com.example.quicknote.presentation.noteListScreen.screenState.NoteListScreenState
+import com.example.quicknote.presentation.noteListScreen.screenState.SelectionState
 import com.example.quicknote.presentation.noteListScreen.screenState.SortState
 import com.example.quicknote.presentation.theme.NoteTheme
 
@@ -54,11 +57,13 @@ fun NoteListScreen(
     onNoteClick: (String, Float, Float) -> Unit,
     onAddNoteClick: () -> Unit,
 ) {
-
     val screenState = noteListViewModel.screenState.collectAsState()
 
     DisposableEffect(Unit) {
-        onDispose { snackbarHost.snackbarHostState.currentSnackbarData?.dismiss() }
+        onDispose {
+            noteListViewModel.clearSelection()
+            snackbarHost.snackbarHostState.currentSnackbarData?.dismiss()
+        }
     }
 
     when (val currentState = screenState.value) {
@@ -90,21 +95,11 @@ fun Screen(
     Scaffold(
         containerColor = NoteTheme.colors.backgroundColor,
         topBar = {
-            TopBarWithAction(
-                title = stringResource(R.string.notes),
-                onActionClick = {
-                    if (screenState.sortState is SortState.NotShown) {
-                        noteListViewModel.showSortOptions()
-                    } else {
-                        noteListViewModel.hideSortOptions()
-                    }
-                },
-                icon = {
-                    Icon(
-                        painter = painterResource(R.drawable.filter_list_24dp),
-                        contentDescription = stringResource(R.string.sort_by)
-                    )
-                }
+            TopBar(
+                screenState.selectionState,
+                screenState.sortState,
+                snackbarHost,
+                noteListViewModel
             )
         },
         floatingActionButton = {
@@ -182,20 +177,28 @@ fun Screen(
                 verticalItemSpacing = 8.dp,
             ) {
                 items(items = screenState.notes, key = { it.id }) { item ->
+                    val selected = screenState.selectionState is SelectionState.Selection &&
+                            screenState.selectionState.notes.find { item.id == it.id } != null
                     NoteItemInList(
                         note = item,
                         onClick = {
-                            onNoteClick(item.id, touchedPoint.x, touchedPoint.y)
+                            if (screenState.selectionState is SelectionState.NoSelection) {
+                                onNoteClick(item.id, touchedPoint.x, touchedPoint.y)
+                            } else {
+                                if (selected) {
+                                    noteListViewModel.onUnselectNote(item)
+                                } else {
+                                    noteListViewModel.onSelectNote(item)
+                                }
+                            }
                         },
                         onLongClick = {
-                            noteListViewModel.addNoteToTrash(item)
-                            snackbarHost.showSnackbar(
-                                message = "Are you sure you want to delete?",
-                                actionLabel = "Undo",
-                                onActionPerformed = { noteListViewModel.removeNoteFromTrash(item.id) },
-                                onDismiss = { noteListViewModel.deleteNote(item.id) }
-                            )
+                            if (screenState.selectionState is SelectionState.NoSelection) {
+                                noteListViewModel.onSelectNote(item)
+                            }
                         },
+                        withSelection = screenState.selectionState is SelectionState.Selection,
+                        selected = selected
                     )
                 }
             }
@@ -264,4 +267,58 @@ fun ChipSortGroup(
     }
 }
 
+private fun deleteNotes(noteListViewModel: NoteListViewModel, snackbarHost: CustomSnackbarHost) {
+    noteListViewModel.onRemoveSelection()
+    noteListViewModel.addSelectedNotesToTrash()
+    snackbarHost.showSnackbar(
+        message = "Are you sure you want to delete?",
+        actionLabel = "Undo",
+        onActionPerformed = {
+            noteListViewModel.removeSelectedNotesFromTrash()
+        },
+        onDismiss = {
+            noteListViewModel.deleteSelectedNotes()
+        }
+    )
+}
+
+@Composable
+private fun TopBar(
+    selectionState: SelectionState,
+    sortState: SortState,
+    snackbarHost: CustomSnackbarHost,
+    noteListViewModel: NoteListViewModel
+) {
+    if (selectionState is SelectionState.Selection) {
+        TopBarWithCancel(
+            title = "${stringResource(R.string.selected)}: ${selectionState.notes.size}",
+            onCancelClick = noteListViewModel::clearSelection,
+            actions = {
+                IconButton(onClick = { deleteNotes(noteListViewModel, snackbarHost) }) {
+                    Icon(
+                        painter = painterResource(R.drawable.delete_24dp),
+                        contentDescription = stringResource(R.string.delete_all)
+                    )
+                }
+            },
+        )
+    } else {
+        TopBarWithAction(
+            title = stringResource(R.string.notes),
+            onActionClick = {
+                if (sortState is SortState.NotShown) {
+                    noteListViewModel.showSortOptions()
+                } else {
+                    noteListViewModel.hideSortOptions()
+                }
+            },
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.filter_list_24dp),
+                    contentDescription = stringResource(R.string.sort_by)
+                )
+            }
+        )
+    }
+}
 

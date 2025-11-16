@@ -1,5 +1,7 @@
 package com.example.quicknote.presentation.noteListScreen
 
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quicknote.domain.Note
@@ -11,6 +13,7 @@ import com.example.quicknote.domain.usecase.GetDeletedNotesUseCase
 import com.example.quicknote.domain.usecase.GetNotesUseCase
 import com.example.quicknote.presentation.noteListScreen.screenState.ContentState
 import com.example.quicknote.presentation.noteListScreen.screenState.NoteListScreenState
+import com.example.quicknote.presentation.noteListScreen.screenState.SelectionState
 import com.example.quicknote.presentation.noteListScreen.screenState.SortState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -43,6 +46,7 @@ class NoteListViewModel @Inject constructor(
     private val _screenState = MutableStateFlow<NoteListScreenState>(NoteListScreenState.Initial)
     val screenState: StateFlow<NoteListScreenState> = _screenState.asStateFlow()
 
+    private val selectedNotes: SnapshotStateList<Note> = mutableStateListOf()
     private val sortState = MutableStateFlow(Sorts(sortByHeadline = false, sortByDate = false))
     private val queryState = MutableStateFlow("")
     val deletedNotesFlow = getDeletedNotesUseCase()
@@ -62,7 +66,7 @@ class NoteListViewModel @Inject constructor(
     init {
         _screenState.value = NoteListScreenState.Content(
             emptyList(), ContentState.NoteList,
-            SortState.NotShown
+            SortState.NotShown, SelectionState.NoSelection
         )
         getNotesByQuerySorted("", Sorts(sortByHeadline = false, sortByDate = false), emptyList())
         filtersFlow.setUpFiltersFlow()
@@ -92,21 +96,29 @@ class NoteListViewModel @Inject constructor(
         }
     }
 
-    fun addNoteToTrash(note: Note) {
+    fun addSelectedNotesToTrash() {
         viewModelScope.launch {
-            addToDeletedNotesUseCase(note)
+            for (note in selectedNotes) {
+                addToDeletedNotesUseCase(note)
+            }
         }
     }
 
-    fun removeNoteFromTrash(id: String) {
+    fun removeSelectedNotesFromTrash() {
         viewModelScope.launch {
-            deleteDeletedNotesUseCase(id)
+            for (note in selectedNotes) {
+                deleteDeletedNotesUseCase(note.id)
+            }
+            selectedNotes.clear()
         }
     }
 
-    fun deleteNote(id: String) {
+    fun deleteSelectedNotes() {
         viewModelScope.launch {
-            deleteNoteUseCase(id)
+            for (note in selectedNotes) {
+                deleteNoteUseCase(note.id)
+            }
+            selectedNotes.clear()
         }
     }
 
@@ -197,6 +209,41 @@ class NoteListViewModel @Inject constructor(
                     contentState = ContentState.NoteList
                 )
             }
+        }
+    }
+
+    fun onSelectNote(note: Note) {
+        selectedNotes.add(note)
+        _screenState.updateState<NoteListScreenState.Content> { currentState ->
+            currentState.copy(
+                selectionState = SelectionState.Selection(selectedNotes)
+            )
+        }
+    }
+
+    fun onUnselectNote(note: Note) {
+        selectedNotes.remove(note)
+        _screenState.updateState<NoteListScreenState.Content> { currentState ->
+            currentState.copy(
+                selectionState = SelectionState.Selection(selectedNotes)
+            )
+        }
+    }
+
+    fun clearSelection() {
+        selectedNotes.clear()
+        _screenState.updateState<NoteListScreenState.Content> { currentState ->
+            currentState.copy(
+                selectionState = SelectionState.NoSelection
+            )
+        }
+    }
+
+    fun onRemoveSelection() {
+        _screenState.updateState<NoteListScreenState.Content> { currentState ->
+            currentState.copy(
+                selectionState = SelectionState.NoSelection
+            )
         }
     }
 
