@@ -1,5 +1,6 @@
 package com.example.quicknote.presentation.component
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -17,7 +18,11 @@ import com.example.quicknote.presentation.theme.NoteTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBarWithCancel(title: String, onCancelClick: () -> Unit, onDeleteClick: () -> Unit) {
+fun TopBarWithCancel(
+    title: String,
+    onCancelClick: () -> Unit,
+    actions: @Composable (RowScope.() -> Unit)
+) {
     TopAppBar(
         title = { Text(title, style = MaterialTheme.typography.titleLarge) },
         navigationIcon = {
@@ -28,14 +33,7 @@ fun TopBarWithCancel(title: String, onCancelClick: () -> Unit, onDeleteClick: ()
                 )
             }
         },
-        actions = {
-            IconButton(onClick = onDeleteClick) {
-                Icon(
-                    painter = painterResource(R.drawable.delete_24dp),
-                    contentDescription = stringResource(R.string.delete_all)
-                )
-            }
-        },
+        actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = NoteTheme.colors.backgroundColor,
             navigationIconContentColor = NoteTheme.colors.textPrimary,

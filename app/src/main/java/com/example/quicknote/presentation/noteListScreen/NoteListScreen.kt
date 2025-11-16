@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -266,8 +267,23 @@ fun ChipSortGroup(
     }
 }
 
+private fun deleteNotes(noteListViewModel: NoteListViewModel, snackbarHost: CustomSnackbarHost) {
+    noteListViewModel.onRemoveSelection()
+    noteListViewModel.addSelectedNotesToTrash()
+    snackbarHost.showSnackbar(
+        message = "Are you sure you want to delete?",
+        actionLabel = "Undo",
+        onActionPerformed = {
+            noteListViewModel.removeSelectedNotesFromTrash()
+        },
+        onDismiss = {
+            noteListViewModel.deleteSelectedNotes()
+        }
+    )
+}
+
 @Composable
-fun TopBar(
+private fun TopBar(
     selectionState: SelectionState,
     sortState: SortState,
     snackbarHost: CustomSnackbarHost,
@@ -277,21 +293,14 @@ fun TopBar(
         TopBarWithCancel(
             title = "${stringResource(R.string.selected)}: ${selectionState.notes.size}",
             onCancelClick = noteListViewModel::clearSelection,
-            onDeleteClick = {
-                noteListViewModel.onRemoveSelection()
-                noteListViewModel.addSelectedNotesToTrash()
-                snackbarHost.showSnackbar(
-                    message = "Are you sure you want to delete?",
-                    actionLabel = "Undo",
-                    onActionPerformed = {
-                        noteListViewModel.removeSelectedNotesFromTrash()
-                    },
-                    onDismiss = {
-                        noteListViewModel.deleteSelectedNotes()
-                    }
-                )
-
-            }
+            actions = {
+                IconButton(onClick = { deleteNotes(noteListViewModel, snackbarHost) }) {
+                    Icon(
+                        painter = painterResource(R.drawable.delete_24dp),
+                        contentDescription = stringResource(R.string.delete_all)
+                    )
+                }
+            },
         )
     } else {
         TopBarWithAction(
@@ -312,3 +321,4 @@ fun TopBar(
         )
     }
 }
+
