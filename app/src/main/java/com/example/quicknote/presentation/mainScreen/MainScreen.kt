@@ -12,6 +12,8 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -34,6 +36,9 @@ import com.example.quicknote.presentation.noteListScreen.NoteListScreen
 import com.example.quicknote.presentation.theme.NoteTheme
 import com.example.quicknote.presentation.trashScreen.TrashScreen
 
+val LocalSnackbarHost = compositionLocalOf<CustomSnackbarHost> {
+    error("No Snackbar Host State")
+}
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
@@ -43,110 +48,112 @@ fun MainScreen() {
     }
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    val snackbarHost = remember { CustomSnackbarHost(scope, snackbarHostState) }
+    val snackbarHost = remember { CustomSnackbarHost(scope, SnackbarHostState()) }
 
     val window = LocalWindowInfo.current
     val screenHeight = window.containerSize.height
     val screenWidth = window.containerSize.width
 
-    Scaffold(
-        containerColor = NoteTheme.colors.backgroundColor,
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState) {
-                Snackbar(
-                    snackbarData = it,
-                    containerColor = NoteTheme.colors.textLight,
-                    contentColor = NoteTheme.colors.textPrimary,
-                    actionColor = NoteTheme.colors.backgroundBrand,
-                )
-            }
-        },
-        bottomBar = {
-            if (selectedTab != null) {
-                BottomNavigation(
-                    navigationOptions = NavigationOptions.entries,
-                    selectedNavigationOption = selectedTab,
-                    onItemClicked = { navOption ->
-                        when (navOption) {
-                            NavigationOptions.NOTE_LIST -> navController.openPoppingAllPrevious(
-                                Route.NoteList
-                            )
+    CompositionLocalProvider(
+        LocalSnackbarHost provides snackbarHost
+    ) {
+        Scaffold(
+            containerColor = NoteTheme.colors.backgroundColor,
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState) {
+                    Snackbar(
+                        snackbarData = it,
+                        containerColor = NoteTheme.colors.textLight,
+                        contentColor = NoteTheme.colors.textPrimary,
+                        actionColor = NoteTheme.colors.backgroundBrand,
+                    )
+                }
+            },
+            bottomBar = {
+                if (selectedTab != null) {
+                    BottomNavigation(
+                        navigationOptions = NavigationOptions.entries,
+                        selectedNavigationOption = selectedTab,
+                        onItemClicked = { navOption ->
+                            when (navOption) {
+                                NavigationOptions.NOTE_LIST -> navController.openPoppingAllPrevious(
+                                    Route.NoteList
+                                )
 
-                            NavigationOptions.DELETED_NOTE_LIST -> navController.openPoppingAllPrevious(
-                                Route.DeletedNoteList
-                            )
+                                NavigationOptions.DELETED_NOTE_LIST -> navController.openPoppingAllPrevious(
+                                    Route.DeletedNoteList
+                                )
+                            }
                         }
-                    }
-                )
-            }
-        },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0)
-    ) { paddingValues ->
-        NavHost(
-            navController = navController,
-            startDestination = Route.NoteList,
-            modifier = Modifier.padding(paddingValues)
-        ) {
-            composable<Route.NoteList>(
-                enterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
-                exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) }
-            ) {
-                NoteListScreen(
-                    snackbarHost = snackbarHost,
-                    onNoteClick = { noteId, touchX, touchY ->
-                        navController.navigate(Route.ExistingNote(noteId, touchX, touchY))
-                    },
-                    onAddNoteClick = {
-                        navController.navigate(Route.NewNote)
-                    },
-                )
-            }
-            composable<Route.NewNote>(
-                enterTransition = {
-                    scaleIn(
-                        tween(500),
-                        transformOrigin = TransformOrigin(1f, 1f)
                     )
-                },
-                exitTransition = { scaleOut() }
+                }
+            },
+            contentWindowInsets = WindowInsets(0, 0, 0, 0)
+        ) { paddingValues ->
+            NavHost(
+                navController = navController,
+                startDestination = Route.NoteList,
+                modifier = Modifier.padding(paddingValues)
             ) {
-                NewNoteScreen(
-                    onBackClick = { navController.navigateUp() }
-                )
-            }
-            composable<Route.ExistingNote>(
-                enterTransition = {
-                    val note = this.targetState.toRoute<Route.ExistingNote>()
-                    scaleIn(
-                        tween(500),
-                        transformOrigin = TransformOrigin(
-                            note.touchX / screenWidth,
-                            note.touchY / screenHeight
+                composable<Route.NoteList>(
+                    enterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
+                    exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) }
+                ) {
+                    NoteListScreen(
+                        onNoteClick = { noteId, touchX, touchY ->
+                            navController.navigate(Route.ExistingNote(noteId, touchX, touchY))
+                        },
+                        onAddNoteClick = {
+                            navController.navigate(Route.NewNote)
+                        },
+                    )
+                }
+                composable<Route.NewNote>(
+                    enterTransition = {
+                        scaleIn(
+                            tween(500),
+                            transformOrigin = TransformOrigin(1f, 1f)
                         )
+                    },
+                    exitTransition = { scaleOut() }
+                ) {
+                    NewNoteScreen(
+                        onBackClick = { navController.navigateUp() }
                     )
-                },
-                exitTransition = { scaleOut() }
-            ) { backStackEntry ->
-                val existingNote = backStackEntry.toRoute<Route.ExistingNote>()
-                val noteViewModel = hiltViewModel(
-                    creationCallback = { factory: ExistingNoteViewModel.NoteViewModelFactory ->
-                        factory.create(existingNote.id)
-                    }
-                )
-                ExistingNoteScreen(
-                    existingNoteViewModel = noteViewModel,
-                    onBackClick = { navController.navigateUp() }
-                )
-            }
-            composable<Route.DeletedNoteList>(
-                enterTransition = { slideInHorizontally { it } },
-                exitTransition = { slideOutHorizontally { it } }
-            ) {
-                TrashScreen()
+                }
+                composable<Route.ExistingNote>(
+                    enterTransition = {
+                        val note = this.targetState.toRoute<Route.ExistingNote>()
+                        scaleIn(
+                            tween(500),
+                            transformOrigin = TransformOrigin(
+                                note.touchX / screenWidth,
+                                note.touchY / screenHeight
+                            )
+                        )
+                    },
+                    exitTransition = { scaleOut() }
+                ) { backStackEntry ->
+                    val existingNote = backStackEntry.toRoute<Route.ExistingNote>()
+                    val noteViewModel = hiltViewModel(
+                        creationCallback = { factory: ExistingNoteViewModel.NoteViewModelFactory ->
+                            factory.create(existingNote.id)
+                        }
+                    )
+                    ExistingNoteScreen(
+                        existingNoteViewModel = noteViewModel,
+                        onBackClick = { navController.navigateUp() }
+                    )
+                }
+                composable<Route.DeletedNoteList>(
+                    enterTransition = { slideInHorizontally { it } },
+                    exitTransition = { slideOutHorizontally { it } }
+                ) {
+                    TrashScreen()
+                }
             }
         }
     }
-
 }
 
 fun NavController.openPoppingAllPrevious(route: Any) {
