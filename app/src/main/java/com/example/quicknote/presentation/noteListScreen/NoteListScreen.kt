@@ -43,6 +43,7 @@ import com.example.quicknote.presentation.component.SearchField
 import com.example.quicknote.presentation.component.TopBarWithAction
 import com.example.quicknote.presentation.component.TopBarWithCancel
 import com.example.quicknote.presentation.mainScreen.CustomSnackbarHost
+import com.example.quicknote.presentation.mainScreen.LocalSnackbarHost
 import com.example.quicknote.presentation.mainScreen.showSnackbar
 import com.example.quicknote.presentation.noteListScreen.screenState.ContentState
 import com.example.quicknote.presentation.noteListScreen.screenState.NoteListScreenState
@@ -52,12 +53,12 @@ import com.example.quicknote.presentation.theme.NoteTheme
 
 @Composable
 fun NoteListScreen(
-    snackbarHost: CustomSnackbarHost,
     noteListViewModel: NoteListViewModel = hiltViewModel(),
     onNoteClick: (String, Float, Float) -> Unit,
     onAddNoteClick: () -> Unit,
 ) {
     val screenState = noteListViewModel.screenState.collectAsState()
+    val snackbarHost = LocalSnackbarHost.current
 
     DisposableEffect(Unit) {
         onDispose {
@@ -267,7 +268,10 @@ fun ChipSortGroup(
     }
 }
 
-private fun deleteNotes(noteListViewModel: NoteListViewModel, snackbarHost: CustomSnackbarHost) {
+private fun deleteNotes(
+    noteListViewModel: NoteListViewModel,
+    snackbarHost: CustomSnackbarHost
+) {
     noteListViewModel.onRemoveSelection()
     noteListViewModel.addSelectedNotesToTrash()
     snackbarHost.showSnackbar(
@@ -294,7 +298,12 @@ private fun TopBar(
             title = "${stringResource(R.string.selected)}: ${selectionState.notes.size}",
             onCancelClick = noteListViewModel::clearSelection,
             actions = {
-                IconButton(onClick = { deleteNotes(noteListViewModel, snackbarHost) }) {
+                IconButton(onClick = {
+                    deleteNotes(
+                        noteListViewModel,
+                        snackbarHost
+                    )
+                }) {
                     Icon(
                         painter = painterResource(R.drawable.delete_24dp),
                         contentDescription = stringResource(R.string.delete_all)

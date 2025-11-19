@@ -232,11 +232,7 @@ class NoteListViewModel @Inject constructor(
 
     fun clearSelection() {
         selectedNotes.clear()
-        _screenState.updateState<NoteListScreenState.Content> { currentState ->
-            currentState.copy(
-                selectionState = SelectionState.NoSelection
-            )
-        }
+        onRemoveSelection()
     }
 
     fun onRemoveSelection() {
