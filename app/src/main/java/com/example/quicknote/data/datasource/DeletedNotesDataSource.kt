@@ -12,7 +12,7 @@ import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 class DeletedNotesDataSource @Inject constructor(
-    @DeletedNotes private val dataStore: DataStore<Preferences>
+    @param:DeletedNotes private val dataStore: DataStore<Preferences>
 ) {
     val notes: Flow<List<NoteModel>> = dataStore.data.map { preferences ->
         preferences.asMap().map { mapEntry ->

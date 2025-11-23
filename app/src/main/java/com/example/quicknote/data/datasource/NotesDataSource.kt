@@ -19,7 +19,7 @@ import kotlinx.serialization.json.Json
 import timber.log.Timber
 
 class NotesDataSource @Inject constructor(
-    @Notes private val dataStore: DataStore<Preferences>
+    @param:Notes private val dataStore: DataStore<Preferences>
 ) {
 
     private val preferencesFlow = dataStore.data
