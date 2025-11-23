@@ -1,26 +1,30 @@
 package com.example.quicknote.presentation.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
+import coil3.compose.AsyncImage
 import com.example.quicknote.R
 import com.example.quicknote.domain.Note
 import com.example.quicknote.presentation.theme.NoteTheme
@@ -36,21 +40,31 @@ fun NoteItemInList(
     selected: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Column(
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        colors = CardColors(
+            containerColor = NoteTheme.colors.noteBackground,
+            contentColor = NoteTheme.colors.textPrimary,
+            disabledContainerColor = NoteTheme.colors.noteBackground,
+            disabledContentColor = NoteTheme.colors.textPrimary
+        ),
         modifier = modifier
-            .clickable(
-                onClick = onClick
-            )
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick,
             )
-            .clip(
-                RoundedCornerShape(8.dp)
-            )
-            .background(color = NoteTheme.colors.noteBackground)
-            .padding(12.dp)
     ) {
+        if (note.images.firstOrNull() != null) {
+            AsyncImage(
+                model = note.images.first().toUri(),
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier
+                    .padding(bottom = 10.dp)
+                    .height(150.dp)
+            )
+        }
+
         if (note.headline.isNotEmpty()) {
             Text(
                 note.headline,
@@ -59,7 +73,7 @@ fun NoteItemInList(
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
                 modifier = Modifier
-                    .padding(bottom = 10.dp),
+                    .padding(bottom = 12.dp, start = 12.dp, end = 12.dp),
             )
         }
 
@@ -70,14 +84,18 @@ fun NoteItemInList(
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 4,
                 style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier
+                    .padding(bottom = 12.dp, start = 12.dp, end = 12.dp)
             )
         }
 
         if (withSelection) {
             Row(
                 modifier = Modifier
+                    .padding(bottom = 12.dp, start = 12.dp, end = 12.dp)
                     .padding(top = 5.dp)
                     .fillMaxWidth()
+
             ) {
                 Text(
                     note.timeOfChange.format(formatter),
@@ -120,7 +138,7 @@ fun NoteItemInList(
                 color = NoteTheme.colors.textLight,
                 maxLines = 1,
                 style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(top = 10.dp)
+                modifier = Modifier.padding(bottom = 12.dp, start = 12.dp, end = 12.dp)
             )
         }
     }

@@ -22,7 +22,9 @@ fun ExistingNoteScreen(
                 onBackClick()
             },
             onHeadlineChanged = { headline -> existingNoteViewModel.onHeadlineChanged(headline) },
-            onValueChanged = { value -> existingNoteViewModel.onValueChanged(value) }
+            onValueChanged = { value -> existingNoteViewModel.onValueChanged(value) },
+            onAddPhotos = { images -> existingNoteViewModel.onAddPhotos(images) },
+            onDeletePhoto = { image -> existingNoteViewModel.onDeletePhoto(image) }
         )
     }
 }

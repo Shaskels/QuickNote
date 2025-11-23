@@ -24,7 +24,8 @@ class NewNoteViewModel @Inject constructor(
     fun addNote() {
         viewModelScope.launch {
             if (_noteState.value is NoteState.Content && ((_noteState.value as NoteState.Content).note.headline.isNotEmpty()
-                        || (_noteState.value as NoteState.Content).note.value.isNotEmpty())
+                        || (_noteState.value as NoteState.Content).note.value.isNotEmpty()
+                        || (_noteState.value as NoteState.Content).note.images.isNotEmpty())
             ) {
                 saveNoteUseCase((_noteState.value as NoteState.Content).note)
             }
@@ -32,27 +33,49 @@ class NewNoteViewModel @Inject constructor(
     }
 
     fun onHeadlineChanged(headline: String) {
-        if (_noteState.value is NoteState.Content) {
-            _noteState.update { currentState ->
-                NoteState.Content(
-                    (currentState as NoteState.Content).note.copy(headline = headline)
-                )
-            }
+        _noteState.updateState<NoteState.Content> { currentState ->
+            currentState.copy(note = currentState.note.copy(headline = headline))
         }
     }
 
     fun onValueChanged(value: String) {
-        if (_noteState.value is NoteState.Content) {
-            _noteState.update { currentState ->
-                NoteState.Content(
-                    (currentState as NoteState.Content).note.copy(value = value)
-                )
-            }
+        _noteState.updateState<NoteState.Content> { currentState ->
+            currentState.copy(note = currentState.note.copy(value = value))
+        }
+    }
+
+    fun onAddPhotos(images: List<String>) {
+        val newImages = (_noteState.value as NoteState.Content).note.images + images
+        _noteState.updateState<NoteState.Content> { currentState ->
+            currentState.copy(note = currentState.note.copy(images = newImages))
+        }
+    }
+
+    fun onDeletePhoto(image: String) {
+        val newImages = (_noteState.value as NoteState.Content).note.images - image
+        _noteState.updateState<NoteState.Content> { currentState ->
+            currentState.copy(note = currentState.note.copy(images = newImages))
         }
     }
 
     fun getEmptyNote(): Note {
-        return Note(id = "", value = "", headline = "", timeOfChange = getCurrentTime())
+        return Note(
+            id = "",
+            value = "",
+            headline = "",
+            timeOfChange = getCurrentTime(),
+            images = emptyList()
+        )
+    }
+
+    private inline fun <reified T : NoteState> MutableStateFlow<NoteState>.updateState(
+        block: (T) -> T
+    ) {
+        if (this.value is T) {
+            this.update {
+                block(this.value as T)
+            }
+        }
     }
 
 }

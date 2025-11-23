@@ -25,7 +25,9 @@ fun NewNoteScreen(
                 onBackClick()
             },
             onHeadlineChanged = { headline -> newNoteViewModel.onHeadlineChanged(headline) },
-            onValueChanged = { value -> newNoteViewModel.onValueChanged(value) }
+            onValueChanged = { value -> newNoteViewModel.onValueChanged(value) },
+            onAddPhotos = { images -> newNoteViewModel.onAddPhotos(images) },
+            onDeletePhoto = { image -> newNoteViewModel.onDeletePhoto(image) }
         )
     }
 

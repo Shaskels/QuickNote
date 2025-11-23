@@ -12,7 +12,8 @@ fun NoteModel.toNote(): Note = Note(
     this.id,
     this.headline,
     this.value,
-    LocalDateTime.parse(this.timeOfChange, formatter)
+    LocalDateTime.parse(this.timeOfChange, formatter),
+    this.images
 )
 
 @OptIn(ExperimentalUuidApi::class)
@@ -20,5 +21,6 @@ fun Note.toNoteModel(): NoteModel = NoteModel(
     id = if (id == "") Uuid.random().toString() else this.id,
     headline = this.headline,
     value = this.value,
-    timeOfChange = getCurrentTime().format(formatter)
+    timeOfChange = getCurrentTime().format(formatter),
+    images = this.images
 )

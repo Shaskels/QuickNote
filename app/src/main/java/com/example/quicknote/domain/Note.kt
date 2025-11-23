@@ -6,7 +6,8 @@ data class Note(
     val id: String,
     val headline: String,
     val value: String,
-    val timeOfChange: LocalDateTime
+    val timeOfChange: LocalDateTime,
+    val images: List<String>
 )
 
 
