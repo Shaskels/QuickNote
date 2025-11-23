@@ -46,7 +46,8 @@ class ExistingNoteViewModel @AssistedInject constructor(
     fun updateNote() {
         viewModelScope.launch {
             if (_noteState.value is NoteState.Content && ((_noteState.value as NoteState.Content).note.headline.isNotEmpty()
-                        || (_noteState.value as NoteState.Content).note.value.isNotEmpty())
+                        || (_noteState.value as NoteState.Content).note.value.isNotEmpty()
+                        || (_noteState.value as NoteState.Content).note.images.isNotEmpty())
             ) {
                 updateNoteUseCase((_noteState.value as NoteState.Content).note)
             }

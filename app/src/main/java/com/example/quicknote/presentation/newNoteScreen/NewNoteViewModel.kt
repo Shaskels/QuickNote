@@ -24,7 +24,8 @@ class NewNoteViewModel @Inject constructor(
     fun addNote() {
         viewModelScope.launch {
             if (_noteState.value is NoteState.Content && ((_noteState.value as NoteState.Content).note.headline.isNotEmpty()
-                        || (_noteState.value as NoteState.Content).note.value.isNotEmpty())
+                        || (_noteState.value as NoteState.Content).note.value.isNotEmpty()
+                        || (_noteState.value as NoteState.Content).note.images.isNotEmpty())
             ) {
                 saveNoteUseCase((_noteState.value as NoteState.Content).note)
             }

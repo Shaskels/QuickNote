@@ -1,15 +1,10 @@
 package com.example.quicknote.presentation.component
 
-import android.Manifest.permission.READ_EXTERNAL_STORAGE
-import android.Manifest.permission.READ_MEDIA_IMAGES
-import android.content.Context
-import android.content.pm.PackageManager.PERMISSION_GRANTED
-import android.os.Build
+import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickMultipleVisualMedia
-import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
@@ -48,7 +43,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import com.example.quicknote.R
 import com.example.quicknote.domain.Note
 import com.example.quicknote.presentation.theme.NoteTheme
@@ -72,16 +66,17 @@ fun NoteScreen(
     val pickMultipleMedia = rememberLauncherForActivityResult(PickMultipleVisualMedia(5)) { uris ->
         if (uris.isNotEmpty()) {
             onAddPhotos(uris.map { it.toString() })
+            uris.forEach { uri ->
+                context.contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            }
             Timber.tag("PhotoPicker").d("Number of items selected: ${uris.size}")
         } else {
             Timber.tag("PhotoPicker").d("No media selected")
         }
     }
-    val requestPermissions =
-        rememberLauncherForActivityResult(RequestMultiplePermissions()) { results ->
-            Timber.tag("PhotoPicker").d(results.toString())
-        }
-
 
     Scaffold(
         containerColor = NoteTheme.colors.backgroundColor,
@@ -91,19 +86,11 @@ fun NoteScreen(
                     contentPadding = PaddingValues(horizontal = 10.dp),
                     actions = {
                         IconButton(onClick = {
-                            if (checkPermissionGranted(context)) {
                                 pickMultipleMedia.launch(
                                     PickVisualMediaRequest(
                                         ActivityResultContracts.PickVisualMedia.ImageOnly
                                     )
                                 )
-                            } else {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    requestPermissions.launch(arrayOf(READ_MEDIA_IMAGES))
-                                } else {
-                                    requestPermissions.launch(arrayOf(READ_EXTERNAL_STORAGE))
-                                }
-                            }
                         }) {
                             Icon(
                                 painterResource(R.drawable.photo_24dp),
@@ -215,20 +202,4 @@ private fun TopBarWithNavigation(onBackClick: () -> Unit, onSaveClick: () -> Uni
         ),
         modifier = Modifier.fillMaxWidth()
     )
-}
-
-private fun checkPermissionGranted(context: Context): Boolean {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(
-            context,
-            READ_MEDIA_IMAGES
-        ) == PERMISSION_GRANTED
-    ) {
-        true
-    } else if (ContextCompat.checkSelfPermission(
-            context,
-            READ_EXTERNAL_STORAGE
-        ) == PERMISSION_GRANTED
-    ) {
-        true
-    } else false
 }

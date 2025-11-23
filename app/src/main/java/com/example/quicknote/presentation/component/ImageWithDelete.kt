@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import coil3.compose.AsyncImage
 import com.example.quicknote.R
 import com.example.quicknote.presentation.theme.NoteTheme
@@ -24,7 +25,7 @@ fun ImageWithDelete(uri: String, onDeleteClick: () -> Unit, modifier: Modifier =
     Box(modifier = modifier) {
 
         AsyncImage(
-            model = uri,
+            model = uri.toUri(),
             contentDescription = null,
             contentScale = ContentScale.FillWidth,
             modifier = Modifier
