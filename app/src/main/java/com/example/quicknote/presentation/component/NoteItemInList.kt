@@ -60,7 +60,6 @@ fun NoteItemInList(
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth,
                 modifier = Modifier
-                    .padding(bottom = 10.dp)
                     .height(150.dp)
             )
         }
@@ -73,7 +72,7 @@ fun NoteItemInList(
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
                 modifier = Modifier
-                    .padding(bottom = 12.dp, start = 12.dp, end = 12.dp),
+                    .padding(top = 12.dp, start = 12.dp, end = 12.dp),
             )
         }
 
@@ -85,14 +84,14 @@ fun NoteItemInList(
                 maxLines = 4,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier
-                    .padding(bottom = 12.dp, start = 12.dp, end = 12.dp)
+                    .padding(top = 12.dp, start = 12.dp, end = 12.dp)
             )
         }
 
         if (withSelection) {
             Row(
                 modifier = Modifier
-                    .padding(bottom = 12.dp, start = 12.dp, end = 12.dp)
+                    .padding(12.dp)
                     .padding(top = 5.dp)
                     .fillMaxWidth()
 
@@ -102,7 +101,6 @@ fun NoteItemInList(
                     color = NoteTheme.colors.textLight,
                     maxLines = 1,
                     style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(top = 10.dp)
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -138,7 +136,7 @@ fun NoteItemInList(
                 color = NoteTheme.colors.textLight,
                 maxLines = 1,
                 style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(bottom = 12.dp, start = 12.dp, end = 12.dp)
+                modifier = Modifier.padding(12.dp)
             )
         }
     }
