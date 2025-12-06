@@ -39,6 +39,7 @@ import com.example.quicknote.presentation.trashScreen.TrashScreen
 val LocalSnackbarHost = compositionLocalOf<CustomSnackbarHost> {
     error("No Snackbar Host State")
 }
+
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
@@ -48,7 +49,7 @@ fun MainScreen() {
     }
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    val snackbarHost = remember { CustomSnackbarHost(scope, SnackbarHostState()) }
+    val snackbarHost = remember { CustomSnackbarHost(scope, snackbarHostState) }
 
     val window = LocalWindowInfo.current
     val screenHeight = window.containerSize.height

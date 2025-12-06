@@ -68,14 +68,15 @@ class NoteListViewModel @Inject constructor(
             emptyList(), ContentState.NoteList,
             SortState.NotShown, SelectionState.NoSelection
         )
-        getNotesByQuerySorted("", Sorts(sortByHeadline = false, sortByDate = false), emptyList())
         filtersFlow.setUpFiltersFlow()
     }
 
     fun getNotesByQuerySorted(query: String, sorts: Sorts, deletedNotes: List<Note>) {
         viewModelScope.launch(exceptionHandler) {
             getNotesUseCase(query, sorts).map { notes ->
-                notes.filter { note -> deletedNotes.firstOrNull { note.id == it.id } == null }
+                notes.filter { note ->
+                    deletedNotes.firstOrNull { note.id == it.id } == null
+                }
             }
                 .onEach {
                     _screenState.update { currentState ->
@@ -97,7 +98,7 @@ class NoteListViewModel @Inject constructor(
     }
 
     fun addSelectedNotesToTrash() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             for (note in selectedNotes) {
                 addToDeletedNotesUseCase(note)
             }
@@ -114,7 +115,7 @@ class NoteListViewModel @Inject constructor(
     }
 
     fun deleteSelectedNotes() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             for (note in selectedNotes) {
                 deleteNoteUseCase(note.id)
             }
@@ -126,18 +127,21 @@ class NoteListViewModel @Inject constructor(
         _screenState.updateState<NoteListScreenState.Content> { currentState ->
             currentState.copy(
                 sortState = SortState.Sorted(
-                    sortState.value.sortByHeadline,
-                    sortState.value.sortByDate
+                    sortByHeadline = false,
+                    sortByDate = false
                 )
             )
         }
     }
 
     fun hideSortOptions() {
-        _screenState.updateState<NoteListScreenState.Content> { currentState ->
-            currentState.copy(
-                sortState = SortState.NotShown
-            )
+        viewModelScope.launch {
+            _screenState.updateState<NoteListScreenState.Content> { currentState ->
+                currentState.copy(
+                    sortState = SortState.NotShown
+                )
+            }
+            sortState.emit(Sorts(sortByHeadline = false, sortByDate = false))
         }
     }
 
